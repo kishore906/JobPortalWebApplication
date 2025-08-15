@@ -7,7 +7,7 @@ namespace JobPortalWebAPI.Repositories
 {
     public interface IUserProfileRepository
     {
-        Task<UserProfile> CreateAsync(UserProfile userProfile);
+        Task<(bool Success, string Message)> CreateAsync(UserProfile userProfile, IFormFile profileImage);
         Task<(bool Success, string Message)> UpdateUserAndProfileAsync(string userId, UpdateUserDTO updateUserDTO);
         Task<IdentityResult> ChangePasswordAsync(ClaimsPrincipal user, string currentPassword, string newPassword);
     }

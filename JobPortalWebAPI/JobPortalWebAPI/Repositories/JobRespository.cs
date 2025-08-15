@@ -46,6 +46,7 @@ namespace JobPortalWebAPI.Repositories
                             UserProfile = new
                             {
                                 fullName = app.UserProfile!.FullName,
+                                location = app.UserProfile.Location,
                                 mobileNumber = app.UserProfile.MobileNumber,
                                 resume = app.UserProfile.ResumeFilePath,
                                 email = app.UserProfile.ApplicationUser!.Email

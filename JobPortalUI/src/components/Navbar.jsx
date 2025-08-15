@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
   const navigate = useNavigate();
-  const user = true;
+  const user = false;
 
   return (
     <div className="shadow py-4">

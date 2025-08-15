@@ -11,6 +11,8 @@ namespace JobPortalWebAPI.Models.Domain
         public string FullName { get; set; } =  string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
 
+        public string? Location {  get; set; }
+
         // Field for User Image
         public string? ProfileImagePath { get; set; }
 

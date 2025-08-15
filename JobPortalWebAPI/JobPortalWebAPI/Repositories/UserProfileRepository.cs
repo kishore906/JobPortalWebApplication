@@ -26,11 +26,22 @@ namespace JobPortalWebAPI.Repositories
             _userManager = userManager;
         }
 
-        public async Task<UserProfile> CreateAsync(UserProfile userProfile)
+        public async Task<(bool Success, string Message)> CreateAsync(UserProfile userProfile, IFormFile profileImage)
         {
+            // generating profile image path
+            if (profileImage != null)
+            {
+                var imageValidationResult = FileUploadStaticClass.ValidateFile(profileImage, AllowedImageExtensions, MaxImageSizeBytes);
+                if (!imageValidationResult.isValid)
+                    return (false, imageValidationResult.errorMessage);
+
+                // saving the new image file and update path 
+                userProfile.ProfileImagePath = await FileUploadStaticClass.SaveFileAsync(profileImage, "Images");
+            }
+
             await _dbContext.AddAsync(userProfile);
             await _dbContext.SaveChangesAsync();
-            return userProfile;
+            return (true, "User Profile Created Successfully.");
         }
 
         public async Task<(bool Success, string Message)> UpdateUserAndProfileAsync(string userId, UpdateUserDTO updateUserDTO)
@@ -53,6 +64,7 @@ namespace JobPortalWebAPI.Repositories
 
             // Updating UserProfile
             user.UserProfile.FullName = updateUserDTO.FullName;
+            user.UserProfile.Location = updateUserDTO.Location;
             user.UserProfile.MobileNumber = updateUserDTO.MobileNumber;
 
             // Handle Profile Image Upload

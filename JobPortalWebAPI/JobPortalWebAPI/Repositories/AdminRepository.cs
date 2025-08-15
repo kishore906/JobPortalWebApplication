@@ -25,6 +25,7 @@ namespace JobPortalWebAPI.Repositories
                     Id = up.ApplicationUserId,
                     FullName = up.FullName,
                     Email = up.ApplicationUser!.Email,
+                    Location = up.Location,
                     MobileNumber = up.MobileNumber,
                     ProfileImagePath = up.ProfileImagePath
                 }).ToListAsync();
@@ -96,6 +97,7 @@ namespace JobPortalWebAPI.Repositories
                         {
                             fullName = ja.UserProfile!.FullName,
                             email = ja.UserProfile.ApplicationUser!.Email,
+                            location = ja.UserProfile.Location,
                             mobileNumber = ja.UserProfile.MobileNumber,
                             resumePath = ja.UserProfile.ResumeFilePath
                         }

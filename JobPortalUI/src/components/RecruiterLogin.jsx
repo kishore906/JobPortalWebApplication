@@ -1,21 +1,52 @@
 import { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
+import { toast } from "react-toastify";
+import { useRegisterCompanyMutation } from "../features/api/authApi";
 
 const RecruiterLogin = ({ setShowRecruiterLogin }) => {
   const [state, setState] = useState("Login");
-  const [companyName, setCompanyName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [formFields, setFormFields] = useState({
+    companyName: "",
+    email: "",
+    password: "",
+    companyLocation: "",
+    companyImage: null,
+  });
+  const [step, setStep] = useState(1);
 
-  const [image, setImage] = useState(false);
-  const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
+  const [registerCompany, { isLoading, isSuccess, error, data }] =
+    useRegisterCompanyMutation();
 
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+
+    if (name === "companyImage") {
+      setFormFields((prevState) => ({ ...prevState, companyImage: files[0] }));
+    } else {
+      setFormFields((prevState) => ({ ...prevState, [name]: value }));
+    }
+  };
+
+  // Step 1
+  const handleNext = (e) => {
+    e.preventDefault();
+    setStep(2);
+  };
+
+  // Step 2
   const onSubmitHandler = (e) => {
     e.preventDefault();
 
-    if (state === "Sign Up" && !isTextDataSubmitted) {
-      setIsTextDataSubmitted(true);
-    }
+    // Create a FormData object to send the form including the image file
+    const data = new FormData();
+    data.append("companyName", formFields.companyName);
+    data.append("email", formFields.email);
+    data.append("password", formFields.password);
+    data.append("companyLocation", formFields.companyLocation);
+    data.append("companyImage", formFields.companyImage);
+    data.append("role", "Recruiter");
+
+    registerCompany(data);
   };
 
   useEffect(() => {
@@ -26,29 +57,45 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+    }
+
+    if (isSuccess) {
+      toast.success(data.message);
+      setShowRecruiterLogin(false);
+    }
+  }, [isSuccess, error, data, setShowRecruiterLogin]);
+
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
       <form
         className="relative bg-white p-10 rounded-xl text-slate-500"
-        onSubmit={onSubmitHandler}
+        onSubmit={step === 1 ? handleNext : onSubmitHandler}
       >
         <h1 className="text-center text-2xl text-neutral-700 font-medium">
           Recruiter {state}
         </h1>
         <p className="text-sm">Welcome back!! Please sign in to continue</p>
-        {state === "Sign Up" && isTextDataSubmitted ? (
+        {state === "Sign Up" && step == 2 ? (
           <>
             <div className="flex items-center gap-4 my-10">
               <label htmlFor="image">
                 <img
-                  src={image ? URL.createObjectURL(image) : assets.upload_area}
+                  src={
+                    formFields.companyImage
+                      ? URL.createObjectURL(formFields.companyImage)
+                      : assets.upload_area
+                  }
                   alt="upload_img"
                   className="w-16 rounded-full"
                 />
                 <input
                   type="file"
                   id="image"
-                  onChange={(e) => setImage(e.target.files[0])}
+                  name="companyImage"
+                  onChange={handleChange}
                   hidden
                 />
               </label>
@@ -66,8 +113,8 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                   type="text"
                   className="outline-none text-sm"
                   name="companyName"
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  value={companyName}
+                  onChange={handleChange}
+                  value={formFields.companyName}
                   placeholder="Company Name.."
                   required
                 />
@@ -79,8 +126,8 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                 type="email"
                 className="outline-none text-sm"
                 name="email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
+                onChange={handleChange}
+                value={formFields.email}
                 placeholder="Email Id.."
                 required
               />
@@ -91,12 +138,26 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                 type="password"
                 className="outline-none text-sm"
                 name="password"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
+                onChange={handleChange}
+                value={formFields.password}
                 placeholder="Password.."
                 required
               />
             </div>
+            {state === "Sign Up" && (
+              <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
+                <img src={assets.location_icon} alt="location_icon" />
+                <input
+                  type="text"
+                  className="outline-none text-sm"
+                  name="companyLocation"
+                  onChange={handleChange}
+                  value={formFields.companyLocation}
+                  placeholder="Location.."
+                  required
+                />
+              </div>
+            )}
           </>
         )}
 
@@ -109,12 +170,9 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
         <button
           type="submit"
           className="bg-blue-600 w-full text-white py-2 rounded-full mt-4"
+          disabled={isLoading}
         >
-          {state === "Login"
-            ? "Login"
-            : isTextDataSubmitted
-            ? "Create Account"
-            : "next"}
+          {state === "Login" ? "Login" : step === 2 ? "Create Account" : "next"}
         </button>
 
         {state === "Login" ? (

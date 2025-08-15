@@ -23,11 +23,22 @@ namespace JobPortalWebAPI.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<CompanyProfile> CreateAsync(CompanyProfile companyProfile)
+        public async Task<(bool Success, string Message)> CreateAsync(CompanyProfile companyProfile, IFormFile companyImage)
         {
+            // generate company profile image
+            if (companyImage != null)
+            {
+                var imageValidationResult = FileUploadStaticClass.ValidateFile(companyImage, AllowedImageExtensions, MaxImageSizeBytes);
+                if (!imageValidationResult.isValid)
+                    return (false, imageValidationResult.errorMessage);
+
+                // saving the new image file and update path 
+                companyProfile.CompanyImagePath = await FileUploadStaticClass.SaveFileAsync(companyImage, "Images");
+            }
+
             await dbContext.AddAsync(companyProfile);
             await dbContext.SaveChangesAsync();
-            return companyProfile;
+            return (true, "Company Profile Created Successfully.");
         }
 
         public async Task<(bool Success, string Message)> UpdateCompanyProfileAsync(string companyId, UpdateCompanyDTO updateCompanyDTO)

@@ -161,19 +161,60 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterUserDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterUserDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterUserDTO"
+                "required": [
+                  "Email",
+                  "FullName",
+                  "MobileNumber",
+                  "Password",
+                  "ProfileImage",
+                  "Role"
+                ],
+                "type": "object",
+                "properties": {
+                  "FullName": {
+                    "type": "string"
+                  },
+                  "Email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "Password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "MobileNumber": {
+                    "type": "string"
+                  },
+                  "ProfileImage": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "Role": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "FullName": {
+                  "style": "form"
+                },
+                "Email": {
+                  "style": "form"
+                },
+                "Password": {
+                  "style": "form"
+                },
+                "MobileNumber": {
+                  "style": "form"
+                },
+                "ProfileImage": {
+                  "style": "form"
+                },
+                "Role": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -294,6 +335,9 @@
                   "FullName": {
                     "type": "string"
                   },
+                  "Location": {
+                    "type": "string"
+                  },
                   "MobileNumber": {
                     "type": "string"
                   },
@@ -312,6 +356,9 @@
                   "style": "form"
                 },
                 "FullName": {
+                  "style": "form"
+                },
+                "Location": {
                   "style": "form"
                 },
                 "MobileNumber": {
@@ -972,6 +1019,7 @@
       },
       "RegisterCompanyUserDTO": {
         "required": [
+          "companyImage",
           "companyLocation",
           "companyName",
           "email",
@@ -980,6 +1028,10 @@
         ],
         "type": "object",
         "properties": {
+          "companyName": {
+            "minLength": 1,
+            "type": "string"
+          },
           "email": {
             "minLength": 1,
             "type": "string",
@@ -989,49 +1041,14 @@
             "minLength": 1,
             "type": "string",
             "format": "password"
-          },
-          "companyName": {
-            "minLength": 1,
-            "type": "string"
           },
           "companyLocation": {
             "minLength": 1,
             "type": "string"
           },
-          "role": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RegisterUserDTO": {
-        "required": [
-          "email",
-          "fullName",
-          "mobileNumber",
-          "password",
-          "role"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "minLength": 1,
+          "companyImage": {
             "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "minLength": 1,
-            "type": "string",
-            "format": "password"
-          },
-          "fullName": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "mobileNumber": {
-            "minLength": 1,
-            "type": "string"
+            "format": "binary"
           },
           "role": {
             "minLength": 1,

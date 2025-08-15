@@ -1,6 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import { useState } from "react";
 import "quill/dist/quill.snow.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Home from "./pages/Home";
 import ApplyJob from "./pages/ApplyJob";
 import Applications from "./pages/Applications";
@@ -29,6 +32,9 @@ function App() {
         <RecruiterLogin setShowRecruiterLogin={setShowRecruiterLogin} />
       )}
       {showUserLogin && <UserLogin setShowUserLogin={setShowUserLogin} />}
+
+      <ToastContainer position="top-center" theme="dark" autoClose={3000} />
+
       <Routes>
         <Route
           path="/"

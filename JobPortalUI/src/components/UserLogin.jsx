@@ -1,21 +1,57 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
+import { useRegisterMutation } from "../features/api/authApi";
 
 const UserLogin = ({ setShowUserLogin }) => {
   const [state, setState] = useState("Login");
-  const [fullName, setFullName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [formFields, setFormFields] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    mobileNumber: "",
+    profileImage: null,
+  });
+  const [step, setStep] = useState(1);
 
-  const [image, setImage] = useState(false);
-  const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
+  const [register, { isLoading, isSuccess, error, data }] =
+    useRegisterMutation();
 
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "profileImage") {
+      setFormFields((prevState) => ({ ...prevState, profileImage: files[0] }));
+    } else {
+      setFormFields((prevState) => ({ ...prevState, [name]: value }));
+    }
+  };
+
+  // Step 1 → Step 2
+  const handleNext = (e) => {
+    e.preventDefault();
+    // we can add validation here if needed
+    setStep(2); // Do NOT submit here
+  };
+
+  // Step 2
   const onSubmitHandler = (e) => {
     e.preventDefault();
 
-    if (state === "Sign Up" && !isTextDataSubmitted) {
-      setIsTextDataSubmitted(true);
-    }
+    // Create a FormData object to send the form including the image file
+    const data = new FormData();
+    data.append("fullName", formFields.fullName);
+    data.append("email", formFields.email);
+    data.append("password", formFields.password);
+    data.append("mobileNumber", formFields.mobileNumber);
+    data.append("profileImage", formFields.profileImage);
+    data.append("role", "User");
+
+    // To print the entire FormData content to the console in a readable way (key-value pairs), you can loop through the FormData entries.
+    // data.forEach((value, key) => {
+    //   console.log(`${key}:`, value);
+    // });
+
+    register(data);
   };
 
   useEffect(() => {
@@ -26,29 +62,46 @@ const UserLogin = ({ setShowUserLogin }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      // set image error
+      console.log(error.data);
+    }
+
+    if (isSuccess) {
+      toast.success(data.message);
+      setShowUserLogin(false); // closing the modal
+    }
+  }, [error, isSuccess, data, setShowUserLogin]);
+
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
       <form
         className="relative bg-white p-10 rounded-xl text-slate-500"
-        onSubmit={onSubmitHandler}
+        onSubmit={step === 1 ? handleNext : onSubmitHandler}
       >
         <h1 className="text-center text-2xl text-neutral-700 font-medium">
           User {state}
         </h1>
-        <p className="text-sm">Welcome back!! Please sign in to continue</p>
-        {state === "Sign Up" && isTextDataSubmitted ? (
+        <p className="text-sm">Welcome back!! Please sign up to continue</p>
+        {state === "Sign Up" && step === 2 ? (
           <>
             <div className="flex items-center gap-4 my-10">
               <label htmlFor="image">
                 <img
-                  src={image ? URL.createObjectURL(image) : assets.upload_area}
+                  src={
+                    formFields.profileImage
+                      ? URL.createObjectURL(formFields.profileImage)
+                      : assets.upload_area
+                  }
                   alt="upload_img"
                   className="w-16 rounded-full"
                 />
                 <input
                   type="file"
                   id="image"
-                  onChange={(e) => setImage(e.target.files[0])}
+                  name="profileImage"
+                  onChange={handleChange}
                   hidden
                 />
               </label>
@@ -66,8 +119,8 @@ const UserLogin = ({ setShowUserLogin }) => {
                   type="text"
                   className="outline-none text-sm"
                   name="fullName"
-                  onChange={(e) => setFullName(e.target.value)}
-                  value={fullName}
+                  onChange={handleChange}
+                  value={formFields.fullName}
                   placeholder="FullName.."
                   required
                 />
@@ -79,8 +132,8 @@ const UserLogin = ({ setShowUserLogin }) => {
                 type="email"
                 className="outline-none text-sm"
                 name="email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
+                onChange={handleChange}
+                value={formFields.email}
                 placeholder="Email Id.."
                 required
               />
@@ -91,12 +144,30 @@ const UserLogin = ({ setShowUserLogin }) => {
                 type="password"
                 className="outline-none text-sm"
                 name="password"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
+                onChange={handleChange}
+                value={formFields.password}
                 placeholder="Password.."
                 required
               />
             </div>
+            {state === "Sign Up" && (
+              <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
+                <img
+                  src={assets.mobile_logo}
+                  alt="location_icon"
+                  className="w-4"
+                />
+                <input
+                  type="text"
+                  className="outline-none text-sm"
+                  name="mobileNumber"
+                  onChange={handleChange}
+                  value={formFields.mobileNumber}
+                  placeholder="MobileNumber.."
+                  required
+                />
+              </div>
+            )}
           </>
         )}
 
@@ -109,12 +180,9 @@ const UserLogin = ({ setShowUserLogin }) => {
         <button
           type="submit"
           className="bg-blue-600 w-full text-white py-2 rounded-full mt-4"
+          disabled={isLoading}
         >
-          {state === "Login"
-            ? "Login"
-            : isTextDataSubmitted
-            ? "Create Account"
-            : "next"}
+          {state === "Login" ? "Login" : step === 2 ? "Create Account" : "next"}
         </button>
 
         {state === "Login" ? (

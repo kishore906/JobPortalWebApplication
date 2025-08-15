@@ -34,7 +34,7 @@ namespace JobPortalWebAPI.Controllers
         [HttpPost]
         [Route("Register")]
         [ValidateModel]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDTO registerUserDTO) { 
+        public async Task<IActionResult> Register([FromForm] RegisterUserDTO registerUserDTO) { 
               // Here if ModelState.IsValid is not true -> ValidateModelAttribute class will display the errors related to model validation before continuing 
 
             // Creating ApplicationUser
@@ -64,11 +64,16 @@ namespace JobPortalWebAPI.Controllers
                             MobileNumber = registerUserDTO.MobileNumber,
                         };
 
-                        await userProfileRepository.CreateAsync(profile);
+                        var (Success, Message) = await userProfileRepository.CreateAsync(profile, registerUserDTO.ProfileImage);
+
+                        if(!Success)
+                        {
+                            return BadRequest(new { message = Message });
+                        }
 
                         return StatusCode(StatusCodes.Status201Created, new
                         {
-                            message = "UserProfile Successfully created!!",
+                            message = Message,
                             user = new
                             {
                                 id = user.Id,
@@ -88,7 +93,7 @@ namespace JobPortalWebAPI.Controllers
         [HttpPost]
         [ValidateModel]
         [Route("RegisterRecruiter")]
-        public async Task<IActionResult> RegisterRecruiter([FromBody] RegisterCompanyUserDTO registerCompanyUserDTO) {
+        public async Task<IActionResult> RegisterRecruiter([FromForm] RegisterCompanyUserDTO registerCompanyUserDTO) {
             // creating company user
             var user = new ApplicationUser
             {
@@ -115,11 +120,13 @@ namespace JobPortalWebAPI.Controllers
                             CompanyLocation = registerCompanyUserDTO.CompanyLocation,
                         };
 
-                        await companyUserRepository.CreateAsync(companyProfile);
+                        var (Success, Message) = await companyUserRepository.CreateAsync(companyProfile, registerCompanyUserDTO.CompanyImage);
+
+                        if (!Success) return BadRequest(new { message = Message });
 
                         return Created("",new
                         {
-                            message = "Company profile created successfully!!",
+                            message = Message,
                             companyDetails = new
                             {
                                 id = user.Id,
@@ -226,6 +233,7 @@ namespace JobPortalWebAPI.Controllers
                     Id = user.Id,
                     Email = user.Email,
                     FullName = user.UserProfile!.FullName,
+                    Location = user.UserProfile.Location,
                     MobileNumber = user.UserProfile.MobileNumber,
                     ProfileImagePath = user.UserProfile.ProfileImagePath
                 });
@@ -302,6 +310,7 @@ namespace JobPortalWebAPI.Controllers
                     Id = user.Id,
                     Email = user.Email,
                     FullName = user.UserProfile!.FullName,
+                    Location = user.UserProfile!.Location,
                     MobileNumber = user.UserProfile.MobileNumber,
                     ProfileImagePath = user.UserProfile.ProfileImagePath
                 });
