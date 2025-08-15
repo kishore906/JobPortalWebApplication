@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { assets } from "../assets/assets";
 import { toast } from "react-toastify";
-import { useRegisterCompanyMutation } from "../features/api/authApi";
+import {
+  useRegisterCompanyMutation,
+  useLoginMutation,
+} from "../features/api/authApi";
+import { setLoginUser } from "../features/slice/userSlice";
 
 const RecruiterLogin = ({ setShowRecruiterLogin }) => {
   const [state, setState] = useState("Login");
@@ -13,13 +18,16 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
     companyImage: null,
   });
   const [step, setStep] = useState(1);
+  const [errors, setErrors] = useState({});
 
   const [registerCompany, { isLoading, isSuccess, error, data }] =
     useRegisterCompanyMutation();
+  const [login, { isSuccess: success, error: err, data: resData }] =
+    useLoginMutation();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     if (name === "companyImage") {
       setFormFields((prevState) => ({ ...prevState, companyImage: files[0] }));
     } else {
@@ -27,26 +35,76 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
     }
   };
 
+  const validateStep1 = () => {
+    let errors = {};
+
+    if (
+      !/^[A-Za-z0-9\s&.,\-/'@]+$/.test(formFields.companyName) ||
+      formFields.companyName === "null"
+    )
+      errors.companyName = "CompanyName cannot be null or have (! # $ % *)";
+    if (!/^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(formFields.email))
+      errors.email = "Enter a valid email Id";
+    if (
+      !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{6,}$/.test(
+        formFields.password
+      )
+    )
+      errors.password =
+        "Minimum length of 6 with 1 upper, 1 lower, digit and special char atleast";
+    if (
+      formFields.companyLocation === "null" ||
+      !/^[A-Za-z0-9\s,.\-/#&]+$/.test(formFields.companyLocation.trim())
+    )
+      errors.companyLocation = "Location cannot be empty or null";
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    let error = {};
+    if (!formFields.companyImage)
+      error.companyImage = "Image is required, please upload";
+    setErrors(error);
+    return Object.keys(error).length === 0;
+  };
+
   // Step 1
   const handleNext = (e) => {
     e.preventDefault();
-    setStep(2);
+    if (validateStep1()) {
+      setStep(2);
+    }
+    return;
   };
 
   // Step 2
   const onSubmitHandler = (e) => {
     e.preventDefault();
 
-    // Create a FormData object to send the form including the image file
-    const data = new FormData();
-    data.append("companyName", formFields.companyName);
-    data.append("email", formFields.email);
-    data.append("password", formFields.password);
-    data.append("companyLocation", formFields.companyLocation);
-    data.append("companyImage", formFields.companyImage);
-    data.append("role", "Recruiter");
+    setErrors({});
 
-    registerCompany(data);
+    if (state === "Sign Up") {
+      if (!validateStep2()) return;
+
+      // Create a FormData object to send the form including the image file
+      const data = new FormData();
+      data.append("companyName", formFields.companyName);
+      data.append("email", formFields.email);
+      data.append("password", formFields.password);
+      data.append("companyLocation", formFields.companyLocation);
+      data.append("companyImage", formFields.companyImage);
+      data.append("role", "Recruiter");
+
+      registerCompany(data);
+    } else if (state === "Login") {
+      const recruiterLogin = {
+        email: formFields.email,
+        password: formFields.password,
+      };
+      login(recruiterLogin);
+    }
   };
 
   useEffect(() => {
@@ -68,16 +126,34 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
     }
   }, [isSuccess, error, data, setShowRecruiterLogin]);
 
+  useEffect(() => {
+    if (err) {
+      setErrors({ errMsg: err.data.message });
+    }
+
+    if (success && resData) {
+      toast.success(resData.message);
+      setShowRecruiterLogin(false);
+      dispatch(setLoginUser(resData.user));
+    }
+  }, [err, success, resData, dispatch, setShowRecruiterLogin]);
+
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
       <form
         className="relative bg-white p-10 rounded-xl text-slate-500"
-        onSubmit={step === 1 ? handleNext : onSubmitHandler}
+        onSubmit={
+          step === 1 && state === "Sign Up" ? handleNext : onSubmitHandler
+        }
       >
         <h1 className="text-center text-2xl text-neutral-700 font-medium">
           Recruiter {state}
         </h1>
-        <p className="text-sm">Welcome back!! Please sign in to continue</p>
+        {state === "Login" ? (
+          <p className="text-sm">🤗 Welcoma back!! Please login to continue</p>
+        ) : (
+          <p className="text-sm">👋 Hello!! Please sign up to continue</p>
+        )}
         {state === "Sign Up" && step == 2 ? (
           <>
             <div className="flex items-center gap-4 my-10">
@@ -103,22 +179,32 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                 Upload Company <br /> logo
               </p>
             </div>
+            {errors.companyImage && (
+              <p className="text-sm text-red-600">{errors.companyImage}</p>
+            )}
           </>
         ) : (
           <>
             {state !== "Login" && (
-              <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.person_icon} alt="person_icon" />
-                <input
-                  type="text"
-                  className="outline-none text-sm"
-                  name="companyName"
-                  onChange={handleChange}
-                  value={formFields.companyName}
-                  placeholder="Company Name.."
-                  required
-                />
-              </div>
+              <>
+                <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
+                  <img src={assets.person_icon} alt="person_icon" />
+                  <input
+                    type="text"
+                    className="outline-none text-sm"
+                    name="companyName"
+                    onChange={handleChange}
+                    value={formFields.companyName}
+                    placeholder="Company Name.."
+                    required
+                  />
+                </div>
+                {errors.companyName && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.companyName}
+                  </p>
+                )}
+              </>
             )}
             <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
               <img src={assets.email_icon} alt="email_icon" />
@@ -132,6 +218,10 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                 required
               />
             </div>
+            {errors.email && (
+              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+            )}
+
             <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
               <img src={assets.lock_icon} alt="lock_icon" />
               <input
@@ -144,21 +234,36 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                 required
               />
             </div>
+            {errors.password && (
+              <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+            )}
+
             {state === "Sign Up" && (
-              <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.location_icon} alt="location_icon" />
-                <input
-                  type="text"
-                  className="outline-none text-sm"
-                  name="companyLocation"
-                  onChange={handleChange}
-                  value={formFields.companyLocation}
-                  placeholder="Location.."
-                  required
-                />
-              </div>
+              <>
+                <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
+                  <img src={assets.location_icon} alt="location_icon" />
+                  <input
+                    type="text"
+                    className="outline-none text-sm"
+                    name="companyLocation"
+                    onChange={handleChange}
+                    value={formFields.companyLocation}
+                    placeholder="Location.."
+                    required
+                  />
+                </div>
+                {errors.companyLocation && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.companyLocation}
+                  </p>
+                )}
+              </>
             )}
           </>
+        )}
+
+        {errors.errMsg && (
+          <p className="text-sm mt-2 text-red-600">{errors.errMsg}</p>
         )}
 
         {state === "Login" && (

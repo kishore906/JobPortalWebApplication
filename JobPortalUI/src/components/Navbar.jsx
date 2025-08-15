@@ -1,9 +1,28 @@
 import { assets } from "../assets/assets";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { setLogoutUser } from "../features/slice/userSlice";
+import { useLogoutMutation } from "../features/api/authApi";
 
 const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
+  const { user, isAuthenticated } = useSelector((state) => state.authResult);
+  const [logout, { isSuccess, error, data }] = useLogoutMutation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = false;
+
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+    }
+
+    if (isSuccess) {
+      toast.success(data.message);
+      dispatch(setLogoutUser(null));
+      navigate("/");
+    }
+  }, [error, isSuccess, data, navigate, dispatch]);
 
   return (
     <div className="shadow py-4">
@@ -14,16 +33,26 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
           onClick={() => navigate("/")}
           className="cursor-pointer"
         />
-        {user ? (
+        {isAuthenticated ? (
           <div className="flex items-center gap-3">
             <Link to="/applications" className="font-bold">
               Applied Jobs
             </Link>
             <p className="max-sm:hidden font-bold">|</p>
-            <p className="max-sm:hidden font-bold">Hi, username</p>
+            <p className="max-sm:hidden font-bold">
+              Hi, {user?.role === "User" ? user.fullName : user?.companyName}
+            </p>
             <div className="relative group">
               <img
-                src={assets.company_icon}
+                src={
+                  user?.role === "User" && user?.profileImage
+                    ? `https://localhost:7091/${user?.profileImage}`
+                    : user?.role === "Recruiter" && user?.companyImage
+                    ? `https://localhost:7091/${user?.companyImage}`
+                    : user?.role === "User"
+                    ? assets.upload_area
+                    : assets.company_icon
+                }
                 alt="company_icon"
                 className="w-8 border-2 border-emerald-100 rounded-full"
               />
@@ -41,7 +70,12 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
                   >
                     Update Password
                   </li>
-                  <li className="py-1 px-2 cursor-pointer pr-10">Logout</li>
+                  <li
+                    className="py-1 px-2 cursor-pointer pr-10"
+                    onClick={() => logout()}
+                  >
+                    Logout
+                  </li>
                 </ul>
               </div>
             </div>

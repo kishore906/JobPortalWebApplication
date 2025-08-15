@@ -18,7 +18,6 @@ namespace JobPortalWebAPI.Models.DTO
         [Required]
         public string MobileNumber { get; set; } = string.Empty;
 
-        [Required]
         public IFormFile? ProfileImage { get; set; }
 
         [Required]

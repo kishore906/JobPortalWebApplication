@@ -164,13 +164,29 @@ namespace JobPortalWebAPI.Controllers
                 if (checkPasswordResult)
                 {
                     // Get the role of the loggedIn user
-                    var role = await userManager.GetRolesAsync(user);
-                    //Console.WriteLine("role: ", role.FirstOrDefault());
+                    var roles = await userManager.GetRolesAsync(user);
+                    var role = roles.FirstOrDefault();
+                    //Console.WriteLine(role);
 
                     if (role != null)
                     {
                         // create JWT Token
-                        var jwtToken = tokenRepository.CreateJWTToken(user, role.FirstOrDefault());
+                        var jwtToken = tokenRepository.CreateJWTToken(user, role);
+
+                        var userWithProfile = new ApplicationUser();
+                        var companyWithProfile = new ApplicationUser();
+
+                        if(role == "User" || role  == "Admin")
+                        {
+                            // retrieving user profile
+                            userWithProfile = await userManager.Users.Include(u => u.UserProfile).FirstOrDefaultAsync(u => u.Id == user.Id);
+                        }
+                        else if(role == "Recruiter")
+                        {
+                            // retrieving company profile
+                            companyWithProfile = await userManager.Users.Include(u => u.CompanyProfile).FirstOrDefaultAsync(u => u.Id == user.Id);
+                        }
+                           
 
                         // creating CookieOptions for the token
                         var cookieOptions = new CookieOptions
@@ -185,6 +201,22 @@ namespace JobPortalWebAPI.Controllers
                         // send the token as response in cookie
                         Response.Cookies.Append("jwt_token", jwtToken, cookieOptions);
 
+                        if(role == "Recruiter")
+                        {
+                            return Ok(new
+                            {
+                                message = "Login Successful!!",
+                                user = new
+                                {
+                                    id = user.Id,
+                                    email = user.Email,
+                                    companyName = companyWithProfile != null && companyWithProfile.CompanyProfile != null ? companyWithProfile.CompanyProfile.CompanyName : null,
+                                    companyImage = companyWithProfile != null && companyWithProfile.CompanyProfile != null && companyWithProfile.CompanyProfile.CompanyImagePath != null ? companyWithProfile.CompanyProfile.CompanyImagePath : null,
+                                    role,
+                                }
+                            });
+                        }
+
                         return Ok(new
                         {
                             message = "Login Successful!!",
@@ -192,6 +224,9 @@ namespace JobPortalWebAPI.Controllers
                             {
                                 id = user.Id,
                                 userName = user.UserName,
+                                fullName = userWithProfile != null && userWithProfile.UserProfile != null ? userWithProfile.UserProfile.FullName : null,
+                                profileImage = userWithProfile != null && userWithProfile.UserProfile != null && userWithProfile.UserProfile.ProfileImagePath != null ? userWithProfile.UserProfile.ProfileImagePath : null,
+                                role,
                             }
                         });
                     }

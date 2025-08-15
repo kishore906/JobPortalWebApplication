@@ -21,6 +21,7 @@ import AllUsers from "./pages/Admin/AllUsers";
 import AllCompanies from "./pages/Admin/AllCompanies";
 import AllJobs from "./pages/Admin/AllJobs";
 import AdminStats from "./pages/Admin/AdminStats";
+import AuthRoute from "./components/AuthRoute";
 
 function App() {
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
@@ -46,22 +47,47 @@ function App() {
           }
         />
         <Route path="/apply-job/:id" element={<ApplyJob />} />
-        <Route path="/applications" element={<Applications />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route index element={<CompanyStatistics />} />
-          <Route path="statistics" element={<CompanyStatistics />} />
-          <Route path="add-job" element={<AddJob />} />
-          <Route path="manage-jobs" element={<ManageJobs />} />
-          <Route path="view-applications" element={<ViewApplications />} />
+        <Route
+          path="/applications"
+          element={
+            <AuthRoute>
+              <Applications />
+            </AuthRoute>
+          }
+        />
+        <Route element={<AuthRoute role="Recruiter" />}>
+          <Route path="/dashboard" element={<Dashboard />}>
+            <Route index element={<CompanyStatistics />} />
+            <Route path="statistics" element={<CompanyStatistics />} />
+            <Route path="add-job" element={<AddJob />} />
+            <Route path="manage-jobs" element={<ManageJobs />} />
+            <Route path="view-applications" element={<ViewApplications />} />
+          </Route>
         </Route>
-        <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/edit-password" element={<EditPassword />} />
-        <Route path="/adminDashboard" element={<AdminDashboard />}>
-          <Route index element={<AdminStats />} />
-          <Route path="statistics" element={<AdminStats />} />
-          <Route path="all-users" element={<AllUsers />} />
-          <Route path="all-companies" element={<AllCompanies />} />
-          <Route path="all-jobs" element={<AllJobs />} />
+        <Route
+          path="/edit-profile"
+          element={
+            <AuthRoute>
+              <EditProfile />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/edit-password"
+          element={
+            <AuthRoute>
+              <EditPassword />
+            </AuthRoute>
+          }
+        />
+        <Route element={<AuthRoute role={"Admin"} />}>
+          <Route path="/adminDashboard" element={<AdminDashboard />}>
+            <Route index element={<AdminStats />} />
+            <Route path="statistics" element={<AdminStats />} />
+            <Route path="all-users" element={<AllUsers />} />
+            <Route path="all-companies" element={<AllCompanies />} />
+            <Route path="all-jobs" element={<AllJobs />} />
+          </Route>
         </Route>
       </Routes>
     </>

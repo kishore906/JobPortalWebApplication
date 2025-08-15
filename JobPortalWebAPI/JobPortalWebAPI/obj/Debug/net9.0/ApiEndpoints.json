@@ -211,9 +211,34 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "registerCompanyUserDTO",
-        "Type": "JobPortalWebAPI.Models.DTO.RegisterCompanyUserDTO",
-        "IsRequired": true
+        "Name": "CompanyName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyLocation",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyImage",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "Role",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

@@ -168,7 +168,6 @@
                   "FullName",
                   "MobileNumber",
                   "Password",
-                  "ProfileImage",
                   "Role"
                 ],
                 "type": "object",
@@ -233,19 +232,60 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterCompanyUserDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterCompanyUserDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterCompanyUserDTO"
+                "required": [
+                  "CompanyImage",
+                  "CompanyLocation",
+                  "CompanyName",
+                  "Email",
+                  "Password",
+                  "Role"
+                ],
+                "type": "object",
+                "properties": {
+                  "CompanyName": {
+                    "type": "string"
+                  },
+                  "Email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "Password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "CompanyLocation": {
+                    "type": "string"
+                  },
+                  "CompanyImage": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "Role": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "CompanyName": {
+                  "style": "form"
+                },
+                "Email": {
+                  "style": "form"
+                },
+                "Password": {
+                  "style": "form"
+                },
+                "CompanyLocation": {
+                  "style": "form"
+                },
+                "CompanyImage": {
+                  "style": "form"
+                },
+                "Role": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -1013,46 +1053,6 @@
             "minLength": 1,
             "type": "string",
             "format": "password"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RegisterCompanyUserDTO": {
-        "required": [
-          "companyImage",
-          "companyLocation",
-          "companyName",
-          "email",
-          "password",
-          "role"
-        ],
-        "type": "object",
-        "properties": {
-          "companyName": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "email": {
-            "minLength": 1,
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "minLength": 1,
-            "type": "string",
-            "format": "password"
-          },
-          "companyLocation": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "companyImage": {
-            "type": "string",
-            "format": "binary"
-          },
-          "role": {
-            "minLength": 1,
-            "type": "string"
           }
         },
         "additionalProperties": false
