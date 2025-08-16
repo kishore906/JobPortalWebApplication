@@ -103,6 +103,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
         email: formFields.email,
         password: formFields.password,
       };
+
       login(recruiterLogin);
     }
   };

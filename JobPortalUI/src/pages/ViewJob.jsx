@@ -8,7 +8,7 @@ import moment from "moment";
 import JobCard from "../components/JobCard";
 import Footer from "../components/Footer";
 
-const ApplyJob = () => {
+const ViewJob = () => {
   const { id } = useParams();
   const [job, setJob] = useState(null);
 
@@ -114,4 +114,4 @@ const ApplyJob = () => {
   );
 };
 
-export default ApplyJob;
+export default ViewJob;

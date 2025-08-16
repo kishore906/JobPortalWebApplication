@@ -142,7 +142,7 @@ const UserLogin = ({ setShowUserLogin }) => {
       // set user in store
       dispatch(setLoginUser(resData.user));
     }
-  }, [err, success, resData, setShowUserLogin, dispatch, login]);
+  }, [err, success, resData, setShowUserLogin, dispatch]);
 
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">

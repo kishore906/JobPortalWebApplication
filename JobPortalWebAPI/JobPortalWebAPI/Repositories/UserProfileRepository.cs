@@ -41,7 +41,7 @@ namespace JobPortalWebAPI.Repositories
 
             await _dbContext.AddAsync(userProfile);
             await _dbContext.SaveChangesAsync();
-            return (true, "User Profile Created Successfully.");
+            return (true, "User Profile Created Successfully");
         }
 
         public async Task<(bool Success, string Message)> UpdateUserAndProfileAsync(string userId, UpdateUserDTO updateUserDTO)
@@ -67,8 +67,23 @@ namespace JobPortalWebAPI.Repositories
             user.UserProfile.Location = updateUserDTO.Location;
             user.UserProfile.MobileNumber = updateUserDTO.MobileNumber;
 
-            // Handle Profile Image Upload
-            if(updateUserDTO.ProfileImage != null)
+            // old Image checking - means user not uploading new image 
+            if(updateUserDTO.OldProfileImage != null && updateUserDTO.ProfileImage == null)
+            {
+                // keep old value or path
+                user.UserProfile.ProfileImagePath = updateUserDTO.OldProfileImage;
+            }
+          
+            // old resume checking -  user not uploading new resume
+            if (updateUserDTO.OldResume != null && updateUserDTO.Resume == null)
+            {
+                // keep old value or path
+                user.UserProfile.ResumeFilePath = updateUserDTO.OldResume;
+            }
+         
+
+            // Handle New Profile Image Upload
+            if (updateUserDTO.ProfileImage != null)
             {
                 var imageValidationResult = FileUploadStaticClass.ValidateFile(updateUserDTO.ProfileImage, AllowedImageExtensions, MaxImageSizeBytes);
                 if (!imageValidationResult.isValid)
@@ -81,7 +96,7 @@ namespace JobPortalWebAPI.Repositories
                 user.UserProfile.ProfileImagePath = await FileUploadStaticClass.SaveFileAsync(updateUserDTO.ProfileImage, "Images");
             }
 
-            // Handle Resume Upload
+            // Handle New Resume Upload
             if(updateUserDTO.Resume != null)
             {
                 var resumeValidationResult = FileUploadStaticClass.ValidateFile(updateUserDTO.Resume, AllowedResumeExtensions, MaxResumeSizeBytes);

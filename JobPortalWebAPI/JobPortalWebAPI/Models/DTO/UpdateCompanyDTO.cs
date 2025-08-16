@@ -14,8 +14,9 @@ namespace JobPortalWebAPI.Models.DTO
         [Required]
         public string CompanyLocation { get; set; } = string.Empty;
 
+        public string OldCompanyImage { get; set; } = string.Empty;
+
         // Image Property
-        [Required]
         public IFormFile? CompanyImage { get; set; }
     }
 }

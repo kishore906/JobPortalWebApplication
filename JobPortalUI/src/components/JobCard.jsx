@@ -24,25 +24,25 @@ const JobCard = ({ job }) => {
           __html: job.description.slice(0, 150) + "...",
         }}
       ></p>
-      <div className="mt-4 flex gap-4 text-sm">
+      <div className="mt-4 text-sm">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
           onClick={() => {
-            navigate(`/apply-job/${job._id}`);
-            scrollTo(0, 0);
-          }}
-        >
-          Apply Now
-        </button>
-        <button
-          className="text-gray-500 border border-gray-500 rounded px-4 py-2"
-          onClick={() => {
-            navigate(`/apply-job/${job._id}`);
+            navigate(`/viewJob/${job._id}`);
             scrollTo(0, 0);
           }}
         >
           View Details
         </button>
+        {/* <button
+          className="text-gray-500 border border-gray-500 rounded px-4 py-2"
+          onClick={() => {
+            navigate(`/viewJob/${job._id}`);
+            scrollTo(0, 0);
+          }}
+        >
+          View Details
+        </button> */}
       </div>
     </div>
   );

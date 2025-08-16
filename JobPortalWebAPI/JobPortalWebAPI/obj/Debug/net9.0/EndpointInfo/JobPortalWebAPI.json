@@ -362,9 +362,7 @@
                 "required": [
                   "Email",
                   "FullName",
-                  "MobileNumber",
-                  "ProfileImage",
-                  "Resume"
+                  "MobileNumber"
                 ],
                 "type": "object",
                 "properties": {
@@ -379,6 +377,12 @@
                     "type": "string"
                   },
                   "MobileNumber": {
+                    "type": "string"
+                  },
+                  "OldProfileImage": {
+                    "type": "string"
+                  },
+                  "OldResume": {
                     "type": "string"
                   },
                   "ProfileImage": {
@@ -402,6 +406,12 @@
                   "style": "form"
                 },
                 "MobileNumber": {
+                  "style": "form"
+                },
+                "OldProfileImage": {
+                  "style": "form"
+                },
+                "OldResume": {
                   "style": "form"
                 },
                 "ProfileImage": {
@@ -431,7 +441,6 @@
             "multipart/form-data": {
               "schema": {
                 "required": [
-                  "CompanyImage",
                   "CompanyLocation",
                   "CompanyName",
                   "Email"
@@ -448,6 +457,9 @@
                   "CompanyLocation": {
                     "type": "string"
                   },
+                  "OldCompanyImage": {
+                    "type": "string"
+                  },
                   "CompanyImage": {
                     "type": "string",
                     "format": "binary"
@@ -462,6 +474,9 @@
                   "style": "form"
                 },
                 "CompanyLocation": {
+                  "style": "form"
+                },
+                "OldCompanyImage": {
                   "style": "form"
                 },
                 "CompanyImage": {
@@ -490,38 +505,7 @@
         }
       }
     },
-    "/api/Auth/UpdateUserPswd": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Auth/UpdateCompanyPswd": {
+    "/api/Auth/UpdatePassword": {
       "post": {
         "tags": [
           "Auth"

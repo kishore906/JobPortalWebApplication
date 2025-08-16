@@ -8,5 +8,7 @@
         public string? Location { get; set; }
         public string? MobileNumber { get; set; }
         public string? ProfileImagePath { get; set; }
+
+        public string? ResumePath { get; set; }
     }
 }

@@ -86,7 +86,7 @@ namespace JobPortalWebAPI.Controllers
                     }
                 }
             }
-            return BadRequest(new { error = "Something went wrong!!" } );
+            return BadRequest(new { error = "Something went wrong" } );
         }
 
         // POST: /api/Auth/RegisterRecruiter
@@ -138,7 +138,7 @@ namespace JobPortalWebAPI.Controllers
                     }
                 }
             }
-            return BadRequest(new { error = "Something went wrong!!" });
+            return BadRequest(new { error = "Something went wrong" });
         }
 
 
@@ -205,7 +205,7 @@ namespace JobPortalWebAPI.Controllers
                         {
                             return Ok(new
                             {
-                                message = "Login Successful!!",
+                                message = "Login Successful",
                                 user = new
                                 {
                                     id = user.Id,
@@ -233,12 +233,12 @@ namespace JobPortalWebAPI.Controllers
                 }
                 else
                 {
-                    return Unauthorized(new { message = "Invalid Email or Password" });
+                    return NotFound(new { message = "Invalid Email or Password" });
                 }
             }
             else
             {
-                return Unauthorized(new { message= "Invalid Email or Password"});
+                return NotFound(new { message= "Invalid Email or Password"});
             }
                 return BadRequest(new { error = "Something went wrong!!" });
         }
@@ -299,6 +299,8 @@ namespace JobPortalWebAPI.Controllers
 
             var result = await userProfileRepository.UpdateUserAndProfileAsync(userId, updateUserDTO);
 
+            if (!result.Success && result.Message == "User Not Found") return NotFound(new {message = result.Message});
+
             if (!result.Success) return BadRequest(new { error = result.Message } );
 
             return Ok(new { message = result.Message });
@@ -316,6 +318,8 @@ namespace JobPortalWebAPI.Controllers
 
             var result = await companyUserRepository.UpdateCompanyProfileAsync(userId, updateCompanyDTO);
 
+            if (!result.Success && result.Message == "User Not Found") return NotFound(new { message = result.Message });
+
             if (!result.Success) return BadRequest(new { error = result.Message });
 
             return Ok(new { message = result.Message } );
@@ -328,15 +332,28 @@ namespace JobPortalWebAPI.Controllers
         public async Task<IActionResult> GetMyProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // from token
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            
+            var user = new ApplicationUser();
 
-            var user = await userManager.Users
-                .Include(u => u.UserProfile)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            if(role == "User" || role == "Admin")
+            {
+                 user = await userManager.Users
+                  .Include(u => u.UserProfile)
+                  .FirstOrDefaultAsync(u => u.Id == userId);
+            }
+            else if(role == "Recruiter")
+            {
+                user = await userManager.Users
+                  .Include(u => u.CompanyProfile)
+                  .FirstOrDefaultAsync(u => u.Id == userId);
+
+            }
 
             if (user == null)
-                return NotFound();
+                return NotFound(new { message = "User Not Found"});
 
-            var role = (await userManager.GetRolesAsync(user)).FirstOrDefault();
+            //var role = (await userManager.GetRolesAsync(user)).FirstOrDefault();
 
             if (role == "User" || role == "Admin")
             {
@@ -347,7 +364,8 @@ namespace JobPortalWebAPI.Controllers
                     FullName = user.UserProfile!.FullName,
                     Location = user.UserProfile!.Location,
                     MobileNumber = user.UserProfile.MobileNumber,
-                    ProfileImagePath = user.UserProfile.ProfileImagePath
+                    ProfileImagePath = user.UserProfile.ProfileImagePath,
+                    ResumePath = user.UserProfile.ResumeFilePath,
                 });
             }
             else
@@ -363,12 +381,12 @@ namespace JobPortalWebAPI.Controllers
             }
         }
 
-        // PUT: /api/Auth/UpdateUserPassword
+        // POST: /api/Auth/UpdateUserPswd
         [HttpPost]
         [ValidateModel]
         [Authorize]
-        [Route("UpdateUserPswd")]
-        public async Task<IActionResult> UpdateUserPassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        [Route("UpdatePassword")]
+        public async Task<IActionResult> UpdatePassword([FromBody] ChangePasswordDTO changePasswordDTO)
         {
             // This is a ClaimsPrincipal from the authenticated request
             //var currentUser = User;
@@ -381,41 +399,40 @@ namespace JobPortalWebAPI.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors.Select(e => e.Description));
+                return BadRequest(new { message = "Password change failed", errors = result.Errors.Select(e => e.Description) });
             }
 
             // Remove token cookie so user must log in again
-            Response.Cookies.Delete("jwt_token");
+            Response.Cookies.Delete("jwt_token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddHours(-1) // expired in the past (assume)
+            });
 
             return Ok(new { message = "Password updated successfully!!" } );
         }
 
-        // PUT: /api/Auth/UpdateUserPassword
-        [HttpPost]
-        [ValidateModel]
-        [Authorize]
-        [Route("UpdateCompanyPswd")]
-        public async Task<IActionResult> UpdateCompanyPassword([FromBody] ChangePasswordDTO changePasswordDTO)
-        {
-            // This is a ClaimsPrincipal from the authenticated request
-            var currentUser = User;
+        // PUT: /api/Auth/UpdateCompanyPswd
+        //[HttpPost]
+        //[ValidateModel]
+        //[Authorize]
+        //[Route("UpdateCompanyPswd")]
+        //public async Task<IActionResult> UpdateCompanyPassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        //{
+        //    var result = await companyUserRepository.ChangePasswordAsync(User, changePasswordDTO.CurrentPassword, changePasswordDTO.NewPassword);
 
-            // Example: get user ID from claims
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine("user id: " + userId);
+        //    if (!result.Succeeded)
+        //    {
+        //        return BadRequest(new { message = "Password change failed", errors = result.Errors.Select(e => e.Description) });
+        //    }
 
-            var result = await companyUserRepository.ChangePasswordAsync(User, changePasswordDTO.CurrentPassword, changePasswordDTO.NewPassword);
+        //    // Remove token cookie so user must log in again
+        //    Response.Cookies.Delete("jwt_token");
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors.Select(e => e.Description));
-            }
-
-            // Remove token cookie so user must log in again
-            Response.Cookies.Delete("jwt_token");
-
-            return Ok(new { message = "Password updated successfully!!" });
-        }
+        //    return Ok(new { message = "Password updated successfully" });
+        //}
 
 
         [HttpPost("logout")]

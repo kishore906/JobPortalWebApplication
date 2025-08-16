@@ -5,11 +5,11 @@ const Hero = () => {
     <div className="container mx-auto px-4 2xl:px-20 my-10">
       <div className="bg-gradient-to-r from-purple-800 to-purple-950 text-white py-16 text-center mx-2 rounded-xl">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium mb-4">
-          Over 10,000+ jobs to apply
+          Start Your Search. Shape Your Future.
         </h2>
         <p className="mb-8 max-w-xl mx-auto text-sm font-light px-5">
           Your next career move starts right here - Explore the best job
-          opportunities and take the first step to your future!!
+          opportunities and build a future you’re proud of!!
         </p>
 
         <div className="flex items-center justify-between bg-white rounded text-gray-600 max-w-xl pl-4 mx-4 sm:mx-auto">
@@ -58,6 +58,7 @@ const Hero = () => {
             className="h-6"
             alt="accenture_logo"
           />
+          <img src={assets.google_logo} className="h-6" alt="google_logo" />
           <img src={assets.samsung_logo} className="h-6" alt="samsung_logo" />
           <img src={assets.amazon_logo} className="h-6" alt="amazon_logo" />
           <img src={assets.adobe_logo} className="h-6" alt="adobe_logo" />

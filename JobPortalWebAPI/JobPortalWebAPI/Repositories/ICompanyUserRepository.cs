@@ -9,6 +9,6 @@ namespace JobPortalWebAPI.Repositories
     {
         Task<(bool Success, string Message)> CreateAsync(CompanyProfile companyProfile, IFormFile companyImage);
         Task<(bool Success, string Message)> UpdateCompanyProfileAsync(string companyId, UpdateCompanyDTO updateCompanyDTO);
-        Task<IdentityResult> ChangePasswordAsync(ClaimsPrincipal user, string currentPassword, string newPassword);
+       // Task<IdentityResult> ChangePasswordAsync(ClaimsPrincipal user, string currentPassword, string newPassword);
     }
 }

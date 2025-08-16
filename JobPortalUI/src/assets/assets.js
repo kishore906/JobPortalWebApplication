@@ -36,6 +36,8 @@ import amazon_logo from "./amazon_logo.png";
 import graph from "./graph.png";
 import company_logo from "./company_icon.png";
 import mobile_logo from "./mobile.svg";
+import google_logo from "./google.png";
+import resume_icon from "./resume.png";
 
 export const assets = {
   logo,
@@ -76,6 +78,8 @@ export const assets = {
   graph,
   company_logo,
   mobile_logo,
+  google_logo,
+  resume_icon,
 };
 
 export const JobCategories = [

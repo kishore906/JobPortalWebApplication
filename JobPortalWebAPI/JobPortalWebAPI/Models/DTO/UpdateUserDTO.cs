@@ -16,12 +16,14 @@ namespace JobPortalWebAPI.Models.DTO
         [Required]
         public string MobileNumber { get; set; } = string.Empty;
 
+        public string? OldProfileImage { get; set; }
+
+        public string? OldResume { get; set; }
+
         // Image Property
-        [Required]
         public IFormFile? ProfileImage { get; set; }
 
         // Resume File Property
-        [Required]
         public IFormFile? Resume { get; set; }
     }
 }

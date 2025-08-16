@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Home from "./pages/Home";
-import ApplyJob from "./pages/ApplyJob";
+import ViewJob from "./pages/ViewJob";
 import Applications from "./pages/Applications";
 import RecruiterLogin from "./components/RecruiterLogin";
 import Dashboard from "./pages/Dashboard";
@@ -46,7 +46,7 @@ function App() {
             />
           }
         />
-        <Route path="/apply-job/:id" element={<ApplyJob />} />
+        <Route path="/viewJob/:id" element={<ViewJob />} />
         <Route
           path="/applications"
           element={

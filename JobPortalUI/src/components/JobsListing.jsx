@@ -16,7 +16,7 @@ const JobsListing = () => {
       {/* Sidebar */}
       <div className="w-full lg:w-1/4 bg-white px-6">
         {/* isSearched && (searchFilter.title !== "" || searchFilter.location !== "") && */}
-        <>
+        <div>
           <h3 className="font-medium text-lg mb-4">Current Search</h3>
           <div className="mb-4 text-gray-600">
             <span className="inline-flex items-center gap-2.5 bg-blue-50 border border-blue-200 px-4 py-1.5 rounded">
@@ -26,7 +26,7 @@ const JobsListing = () => {
               JobLocation <img src={assets.cross_icon} alt="cross_icon" />
             </span>
           </div>
-        </>
+        </div>
 
         <button
           className="px-6 py-1.5 rounded border border-gray-400 lg:hidden"

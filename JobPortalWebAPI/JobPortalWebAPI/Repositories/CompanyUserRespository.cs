@@ -38,7 +38,7 @@ namespace JobPortalWebAPI.Repositories
 
             await dbContext.AddAsync(companyProfile);
             await dbContext.SaveChangesAsync();
-            return (true, "Company Profile Created Successfully.");
+            return (true, "Company Profile Created Successfully");
         }
 
         public async Task<(bool Success, string Message)> UpdateCompanyProfileAsync(string companyId, UpdateCompanyDTO updateCompanyDTO)
@@ -60,6 +60,14 @@ namespace JobPortalWebAPI.Repositories
             companyUser.CompanyProfile.CompanyName = updateCompanyDTO.CompanyName;
             companyUser.CompanyProfile.CompanyLocation = updateCompanyDTO.CompanyLocation;
 
+            // old Image checking - user is not uploading new Image
+            if (updateCompanyDTO.OldCompanyImage != null && updateCompanyDTO.CompanyImage == null)
+            {
+                // keep old value or path
+                companyUser.CompanyProfile.CompanyImagePath = updateCompanyDTO.OldCompanyImage;
+            }
+
+            // if user uploads new image
             if (updateCompanyDTO.CompanyImage != null)
             {
                 var imageValidationResult = FileUploadStaticClass.ValidateFile(updateCompanyDTO.CompanyImage, AllowedImageExtensions, MaxImageSizeBytes);
@@ -77,21 +85,21 @@ namespace JobPortalWebAPI.Repositories
             if (!updateResult.Succeeded) return (false, "Failed to update company profile.");
 
             await dbContext.SaveChangesAsync();
-            return (true, "CompanyProfile Updated Successfully."); // update successful
+            return (true, "CompanyProfile Updated Successfully"); // update successful
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(ClaimsPrincipal userPrincipal, string currentPassword, string newPassword)
-        {
-            var user = await userManager.GetUserAsync(userPrincipal);
+        //public async Task<IdentityResult> ChangePasswordAsync(ClaimsPrincipal userPrincipal, string currentPassword, string newPassword)
+        //{
+        //    var user = await userManager.GetUserAsync(userPrincipal);
 
-            if(user == null)
-            {
-                return IdentityResult.Failed(new IdentityError
-                {
-                    Description = "User Not Found"
-                });
-            }
-            return await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
-        }
+        //    if(user == null)
+        //    {
+        //        return IdentityResult.Failed(new IdentityError
+        //        {
+        //            Description = "User Not Found"
+        //        });
+        //    }
+        //    return await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        //}
     }
 }

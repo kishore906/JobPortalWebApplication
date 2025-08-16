@@ -36,7 +36,7 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
         {isAuthenticated ? (
           <div className="flex items-center gap-3">
             <Link to="/applications" className="font-bold">
-              Applied Jobs
+              {user?.role === "User" ? "Applied" : "Posted"} Jobs
             </Link>
             <p className="max-sm:hidden font-bold">|</p>
             <p className="max-sm:hidden font-bold">
