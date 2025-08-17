@@ -121,10 +121,6 @@ const EditProfile = () => {
         );
       }
 
-      // for (let [key, value] of companyData.entries()) {
-      //   console.log(key, value);
-      // }
-
       updateCompanyProfile(companyData);
     }
   };
@@ -270,10 +266,15 @@ const EditProfile = () => {
                     Current Resume:
                   </label>
                   {existingResumeUrl ? (
-                    <a href={existingResumeUrl} id="currresume" target="_blank">
+                    <a
+                      href={existingResumeUrl}
+                      id="currresume"
+                      target="_blank"
+                      className="bg-blue-50 text-blue-400 px-3 py-1 rounded inline-flex gap-2 items-center"
+                    >
                       <img
                         src={assets.resume_icon}
-                        className="w-8 inline-flex items-center"
+                        className="w-8"
                         alt="resume_icon"
                       />
                       View Resume

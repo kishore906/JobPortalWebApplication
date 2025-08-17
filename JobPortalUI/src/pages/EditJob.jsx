@@ -1,12 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import Quill from "quill";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import DOMPurify from "dompurify";
-import { usePostJobMutation } from "../features/api/companyApi";
+import {
+  useGetJobIdQuery,
+  useUpdateJobMutation,
+} from "../features/api/companyApi";
 import { JobCategories, JobLocations } from "../assets/assets";
+import Loading from "../components/Loading";
 
-const AddJob = () => {
+const EditJob = () => {
   const [job, setJob] = useState({
     title: "",
     type: "",
@@ -19,7 +23,10 @@ const AddJob = () => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
-  const [postJob, { isLoading, isSuccess, error, data }] = usePostJobMutation();
+  const { id } = useParams();
+  const { error: jobErr, data: jobRes } = useGetJobIdQuery(id);
+  const [updateJob, { isLoading, isSuccess, error, data }] =
+    useUpdateJobMutation();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -30,7 +37,7 @@ const AddJob = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const jobPost = {
+    const jobPostToBeUpdated = {
       jobTitle: job.title,
       jobDescription: DOMPurify.sanitize(
         quillRef.current.root.innerHTML
@@ -41,7 +48,7 @@ const AddJob = () => {
       jobLevel: job.level,
       jobSalary: job.salary,
     };
-    postJob(jobPost);
+    updateJob({ id, jobPostToBeUpdated });
   };
 
   useEffect(() => {
@@ -53,7 +60,32 @@ const AddJob = () => {
     }
   }, []);
 
-  // useEffect for handling postJob request
+  // handling fetch job by Id
+  useEffect(() => {
+    console.log("fetching job...");
+    if (jobErr) {
+      toast.error(jobErr.data.message);
+    }
+
+    if (jobRes) {
+      const fetchedJob = {
+        title: jobRes.jobInfo.jobTitle,
+        type: jobRes.jobInfo.jobType,
+        category: jobRes.jobInfo.jobCategory,
+        location: jobRes.jobInfo.jobLocation,
+        level: jobRes.jobInfo.jobLevel,
+        salary: jobRes.jobInfo.jobSalary,
+      };
+      setJob(fetchedJob);
+      if (quillRef.current) {
+        quillRef.current.clipboard.dangerouslyPasteHTML(
+          jobRes.jobInfo.jobDescription
+        );
+      }
+    }
+  }, [jobErr, jobRes]);
+
+  //useEffect for handling updateJob request
   useEffect(() => {
     if (error) {
       console.log(error);
@@ -64,7 +96,7 @@ const AddJob = () => {
       toast.success(data.message);
       navigate("/dashboard/manage-jobs");
     }
-  }, [error, isSuccess, data, navigate]);
+  }, [error, isSuccess, data, navigate, jobErr, jobRes]);
 
   return (
     <form
@@ -75,10 +107,9 @@ const AddJob = () => {
         <p className="mb-2 font-bold">Job Title</p>
         <input
           type="text"
-          placeholder="Job Title.."
           name="title"
           onChange={handleChange}
-          value={job.title}
+          value={job?.title ?? ""}
           className="w-full px-3 py-2 border-2 border-gray-300 rounded outline-none"
           required
         />
@@ -95,7 +126,7 @@ const AddJob = () => {
           <select
             onChange={handleChange}
             name="category"
-            value={job.category}
+            value={job?.category}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded outline-none"
             required
           >
@@ -113,7 +144,7 @@ const AddJob = () => {
           <select
             onChange={handleChange}
             name="location"
-            value={job.location}
+            value={job?.location}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded outline-none"
             required
           >
@@ -131,7 +162,7 @@ const AddJob = () => {
           <select
             onChange={handleChange}
             name="type"
-            value={job.type}
+            value={job?.type}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded outline-none"
             required
           >
@@ -149,7 +180,7 @@ const AddJob = () => {
           <select
             onChange={handleChange}
             name="level"
-            value={job.level}
+            value={job?.level}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded outline-none"
             required
           >
@@ -168,9 +199,8 @@ const AddJob = () => {
         <input
           type="number"
           name="salary"
-          placeholder="50000"
           onChange={handleChange}
-          value={job.salary}
+          value={job?.salary ?? ""}
           min={25000}
           className="w-full px-3 py-2 border-2 border-gray-300 rounded sm:w-[120px] outline-none"
           required
@@ -182,10 +212,10 @@ const AddJob = () => {
         className="w-28 py-3 mt-4 bg-black text-white rounded"
         disabled={isLoading}
       >
-        Add Job
+        Update Job
       </button>
     </form>
   );
 };
 
-export default AddJob;
+export default EditJob;

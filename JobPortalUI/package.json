@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "@tailwindcss/vite": "^4.1.8",
+    "dompurify": "^3.2.6",
     "k-convert": "^1.0.6",
     "moment": "^2.30.1",
     "quill": "^2.0.3",

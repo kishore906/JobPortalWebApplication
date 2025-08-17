@@ -84,6 +84,8 @@ export const assets = {
 
 export const JobCategories = [
   "Programming",
+  "Web Development",
+  "Analyst",
   "Data Science",
   "Designing",
   "Networking",
@@ -93,13 +95,18 @@ export const JobCategories = [
 ];
 
 export const JobLocations = [
-  "Bangalore",
-  "Washington",
-  "Hyderabad",
-  "Mumbai",
-  "California",
-  "Chennai",
-  "New York",
+  "Melbourne, Australia",
+  "Sydney, Australia",
+  "Adelaide, Australia",
+  "Perth, Australia",
+  "Brisbane, Australia",
+  "Bangalore, India",
+  "Washington DC, USA",
+  "Hyderabad, India",
+  "Mumbai, India",
+  "California, USA",
+  "Chennai, India",
+  "New York, USA",
 ];
 
 // Sample data for Manage Jobs Page

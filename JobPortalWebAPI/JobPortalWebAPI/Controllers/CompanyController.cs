@@ -37,6 +37,7 @@ namespace JobPortalWebAPI.Controllers
                 JobTitle = jobDTO.JobTitle,
                 JobDescription = jobDTO.JobDescription,
                 JobType = jobDTO.JobType,
+                JobCategory = jobDTO.JobCategory,
                 JobLocation = jobDTO.JobLocation,
                 JobSalary = jobDTO.JobSalary,
                 JobLevel = jobDTO.JobLevel,
@@ -64,6 +65,8 @@ namespace JobPortalWebAPI.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId == null) return Unauthorized(new { message = "Authentication required. Please login." });
+            
+            Console.WriteLine(jobDTO);
 
             // Converting JobDTO to Job model
             var job = new Job
@@ -71,6 +74,7 @@ namespace JobPortalWebAPI.Controllers
                 JobTitle = jobDTO.JobTitle,
                 JobDescription = jobDTO.JobDescription,
                 JobType = jobDTO.JobType,
+                JobCategory = jobDTO.JobCategory,
                 JobLocation = jobDTO.JobLocation,
                 JobSalary = jobDTO.JobSalary,
                 JobLevel = jobDTO.JobLevel,
@@ -113,6 +117,7 @@ namespace JobPortalWebAPI.Controllers
         // Get All Jobs of the Company
         [HttpGet]
         [Authorize(Roles = "Recruiter")]
+        [Route("getAllJobs")]
         public async Task<IActionResult> GetAllJobsOfTheCompany()
         {
             // Get current logged-in user's ApplicationUserId (string)
@@ -124,7 +129,7 @@ namespace JobPortalWebAPI.Controllers
             // get all the jobs by calling repository method
             var jobs = await jobRepository.GetAllJobsOfTheCompanyAsync(userId);
 
-            if (jobs.Count == 0) return NotFound(new { message = "No jobs are found." } );
+            if (jobs.Count == 0) return Ok(new { message = "No jobs are found." } );
 
             return Ok(jobs);
         }

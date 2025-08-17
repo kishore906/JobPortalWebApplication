@@ -7,5 +7,6 @@
         public string? CompanyEmail { get; set; }
         public string? CompanyImagePath { get; set; }
         public string? CompanyLocation { get; set; }
+        public string? Role { get; set; }
     }
 }

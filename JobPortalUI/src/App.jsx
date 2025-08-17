@@ -11,7 +11,6 @@ import RecruiterLogin from "./components/RecruiterLogin";
 import Dashboard from "./pages/Dashboard";
 import AddJob from "./pages/AddJob";
 import ManageJobs from "./pages/ManageJobs";
-import ViewApplications from "./pages/ViewApplications";
 import UserLogin from "./components/UserLogin";
 import EditProfile from "./pages/EditProfile";
 import EditPassword from "./pages/EditPassword";
@@ -22,6 +21,9 @@ import AllCompanies from "./pages/Admin/AllCompanies";
 import AllJobs from "./pages/Admin/AllJobs";
 import AdminStats from "./pages/Admin/AdminStats";
 import AuthRoute from "./components/AuthRoute";
+import ViewJobAndApplications from "./pages/ViewJobAndApplications";
+import EditJob from "./pages/EditJob";
+import JobInfoAndUserApplications from "./pages/JobInfoAndUserApplications";
 
 function App() {
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
@@ -60,8 +62,16 @@ function App() {
             <Route index element={<CompanyStatistics />} />
             <Route path="statistics" element={<CompanyStatistics />} />
             <Route path="add-job" element={<AddJob />} />
+            <Route
+              path="jobInfoAndUsersApplications/:id"
+              element={<JobInfoAndUserApplications />}
+            />
+            <Route path="updateJob/:id" element={<EditJob />} />
             <Route path="manage-jobs" element={<ManageJobs />} />
-            <Route path="view-applications" element={<ViewApplications />} />
+            <Route
+              path="viewjob-and-applications"
+              element={<ViewJobAndApplications />}
+            />
           </Route>
         </Route>
         <Route

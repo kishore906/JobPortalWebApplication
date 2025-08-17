@@ -348,16 +348,6 @@
   },
   {
     "ContainingType": "JobPortalWebAPI.Controllers.CompanyController",
-    "Method": "GetAllJobsOfTheCompany",
-    "RelativePath": "api/Company",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "JobPortalWebAPI.Controllers.CompanyController",
     "Method": "DeleteJob",
     "RelativePath": "api/Company/{id}",
     "HttpMethod": "DELETE",
@@ -370,6 +360,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JobPortalWebAPI.Controllers.CompanyController",
+    "Method": "GetAllJobsOfTheCompany",
+    "RelativePath": "api/Company/getAllJobs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

@@ -366,6 +366,7 @@ namespace JobPortalWebAPI.Controllers
                     MobileNumber = user.UserProfile.MobileNumber,
                     ProfileImagePath = user.UserProfile.ProfileImagePath,
                     ResumePath = user.UserProfile.ResumeFilePath,
+                    Role = role,
                 });
             }
             else
@@ -376,7 +377,8 @@ namespace JobPortalWebAPI.Controllers
                     CompanyEmail = user.Email,
                     CompanyName = user.CompanyProfile!.CompanyName,
                     CompanyLocation = user.CompanyProfile.CompanyLocation,
-                    CompanyImagePath = user.CompanyProfile.CompanyImagePath
+                    CompanyImagePath = user.CompanyProfile.CompanyImagePath,
+                    Role= role,
                 });
             }
         }

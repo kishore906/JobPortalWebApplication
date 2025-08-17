@@ -1,28 +1,12 @@
 import { assets } from "../assets/assets";
-import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { setLogoutUser } from "../features/slice/userSlice";
-import { useLogoutMutation } from "../features/api/authApi";
+import { useSelector } from "react-redux";
+import { useLogout } from "../customHooks/useLogout";
 
 const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
   const { user, isAuthenticated } = useSelector((state) => state.authResult);
-  const [logout, { isSuccess, error, data }] = useLogoutMutation();
-  const dispatch = useDispatch();
+  const { logout } = useLogout();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-    }
-
-    if (isSuccess) {
-      toast.success(data.message);
-      dispatch(setLogoutUser(null));
-      navigate("/");
-    }
-  }, [error, isSuccess, data, navigate, dispatch]);
 
   return (
     <div className="shadow py-4">
@@ -35,7 +19,14 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
         />
         {isAuthenticated ? (
           <div className="flex items-center gap-3">
-            <Link to="/applications" className="font-bold">
+            <Link
+              to={
+                user?.role === "User"
+                  ? "/applications"
+                  : "/dashboard/manage-jobs"
+              }
+              className="font-bold"
+            >
               {user?.role === "User" ? "Applied" : "Posted"} Jobs
             </Link>
             <p className="max-sm:hidden font-bold">|</p>
@@ -51,7 +42,7 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
                     ? `https://localhost:7091/${user?.companyImage}`
                     : user?.role === "User"
                     ? assets.upload_area
-                    : assets.company_icon
+                    : assets.company_logo
                 }
                 alt="company_icon"
                 className="w-8 border-2 border-emerald-100 rounded-full"

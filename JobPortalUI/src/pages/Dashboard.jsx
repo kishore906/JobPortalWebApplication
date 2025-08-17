@@ -1,7 +1,11 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { assets } from "../assets/assets";
+import { useLogout } from "../customHooks/useLogout";
 
 const Dashboard = () => {
+  const { user } = useSelector((state) => state.authResult);
+  const { logout } = useLogout();
   const navigate = useNavigate();
 
   return (
@@ -16,16 +20,27 @@ const Dashboard = () => {
             onClick={() => navigate("/")}
           />
           <div className="flex items-center gap-3">
-            <p className="max-sm:hidden font-[700]">Welcome, CompanyName</p>
+            <p className="max-sm:hidden font-[700]">
+              Welcome, {user?.companyName}
+            </p>
             <div className="relative group">
               <img
-                src={assets.company_icon}
+                src={
+                  user?.companyImage
+                    ? `https://localhost:7091/${user?.companyImage}`
+                    : assets.company_logo
+                }
                 alt="company_icon"
                 className="w-8 border-2 border-emerald-100 rounded-full"
               />
               <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
                 <ul className="list-none m-0 p-2 bg-white rounded-md shadow text-sm">
-                  <li className="py-1 px-2 cursor-pointer pr-10">Logout</li>
+                  <li
+                    className="py-1 px-2 cursor-pointer pr-10"
+                    onClick={() => logout()}
+                  >
+                    Logout
+                  </li>
                 </ul>
               </div>
             </div>
@@ -75,7 +90,7 @@ const Dashboard = () => {
             </NavLink>
 
             <NavLink
-              to={"/dashboard/view-applications"}
+              to={"/dashboard/viewjob-and-applications"}
               className={({ isActive }) =>
                 `flex items-center p-3 sm:px-6 gap-2 w-full hover:bg-gray-100 ${
                   isActive && "bg-blue-100 border-r-4 border-blue-500"
@@ -87,7 +102,7 @@ const Dashboard = () => {
                 alt="person_tick_icon"
                 className="min-w-4"
               />
-              <p className="max-sm:hidden">View Applications</p>
+              <p className="max-sm:hidden">Job & Applications</p>
             </NavLink>
           </ul>
         </div>
