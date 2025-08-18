@@ -150,7 +150,7 @@ namespace JobPortalWebAPI.Repositories
             const int pageSize = 9; // number of jobs per page
 
             // Base query: include related CompanyProfile
-            var query = _dbContext.Jobs.Include(j => j.CompanyProfile).AsQueryable();
+            var query = _dbContext.Jobs.Where(j => j.JobStatus == "Open").Include(j => j.CompanyProfile).AsQueryable();
 
             // Initial load (no search, no filters)
             if (string.IsNullOrWhiteSpace(searchQuery) &&
@@ -161,7 +161,8 @@ namespace JobPortalWebAPI.Repositories
                     {
                         var latestJobs = await query
                             .OrderByDescending(j => j.PostedOn) // latest first
-                            .Take(20) // only 20 jobs
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize) 
                             .Select(job => new ReturnJobDTO
                             {
                                 Id = job.Id,
@@ -269,6 +270,33 @@ namespace JobPortalWebAPI.Repositories
                 totalPages,
                 jobs
             };
+        }
+
+        public async Task<object?> GetJobByIdAsync(Guid jobId)
+        {
+            var job = await _dbContext.Jobs
+                    .Where(j => j.Id == jobId)
+                    .Select(j => new
+                    {
+                        JobInfo = new ReturnJobDTO
+                        {
+                            Id = j.Id,
+                            JobTitle = j.JobTitle,
+                            JobDescription = j.JobDescription,
+                            JobCategory = j.JobCategory,
+                            JobType = j.JobType,
+                            JobLocation = j.JobLocation,
+                            JobSalary = j.JobSalary,
+                            JobLevel = j.JobLevel,
+                            PostedOn = j.PostedOn,
+                            Company = new ReturnCompanyDTO
+                            {
+                                CompanyName = j.CompanyProfile!.CompanyName,
+                                CompanyImagePath = j.CompanyProfile.CompanyImagePath,
+                            }
+                        }
+                    }).FirstOrDefaultAsync();
+            return job;
         }
     }
 }

@@ -19,6 +19,15 @@ namespace JobPortalWebAPI.Controllers
             this.userJobRepository = userJobRepository;
         }
 
+        // get job by id
+        [HttpGet]
+        [Route("getJobById/{id}")]
+        public async Task<IActionResult> GetJobById([FromRoute] Guid id)
+        {
+            var job = await userJobRepository.GetJobByIdAsync(id);
+            if (job == null) return NotFound(new { message = "Job Not Found." });
+            return Ok(job);
+        }
 
         // Save a Job
         [HttpPost]

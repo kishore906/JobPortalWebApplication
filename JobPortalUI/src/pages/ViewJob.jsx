@@ -7,19 +7,24 @@ import kconvert from "k-convert";
 import moment from "moment";
 import JobCard from "../components/JobCard";
 import Footer from "../components/Footer";
+import { useGetJobByIdQuery } from "../features/api/userApi";
 
 const ViewJob = () => {
   const { id } = useParams();
   const [job, setJob] = useState(null);
 
+  const { isSuccess, error, data } = useGetJobByIdQuery(id);
+
   useEffect(() => {
-    if (jobsData.length > 0) {
-      const job = jobsData.find((job) => job._id === id);
-      if (job !== null) {
-        setJob(job);
-      }
+    if (error) {
+      console.log(error);
     }
-  }, [id]);
+
+    if (isSuccess && data) {
+      console.log(data);
+      setJob(data);
+    }
+  }, [error, isSuccess, data]);
 
   return job ? (
     <>
@@ -31,30 +36,34 @@ const ViewJob = () => {
           <div className="flex justify-center md:justify-between flex-wrap gap-8 px-14 py-20 mb-6 bg-sky-50 border border-sky-400 rounded-xl">
             <div className="flex flex-col md:flex-row items-center">
               <img
-                src={job.companyId.image}
+                src={
+                  job?.jobInfo?.company?.companyImagePath
+                    ? `https://localhost:7091/${job?.jobInfo?.company?.companyImagePath}`
+                    : assets.company_logo
+                }
                 alt="company_logo"
                 className="h-24 bg-white rounded-lg p-4 mr-4 max-md:mb-4"
               />
               <div className="text-center md:text-left text-neutral-700">
                 <h1 className="text-2xl sm:text-4xl font-medium">
-                  {job.title}
+                  {job?.jobInfo?.jobTitle}
                 </h1>
                 <div className="flex flex-row flex-wrap max-md:justify-center gap-y-2 gap-6 items-center text-gray-600 mt-2">
                   <span className="flex items-center gap-1">
                     <img src={assets.suitcase_icon} alt="suitcase_icon" />
-                    {job.companyId.name}
+                    {job?.jobInfo?.company?.companyName}
                   </span>
                   <span className="flex items-center gap-1">
                     <img src={assets.location_icon} alt="location_icon" />
-                    {job.location}
+                    {job?.jobInfo?.jobLocation}
                   </span>
                   <span className="flex items-center gap-1">
                     <img src={assets.person_icon} alt="person_icon" />
-                    {job.level}
+                    {job?.jobInfo?.jobLevel}
                   </span>
                   <span className="flex items-center gap-1">
                     <img src={assets.money_icon} alt="money_icon" />
-                    CTC: {kconvert.convertTo(job.salary)}
+                    Salary: {kconvert.convertTo(job?.jobInfo?.jobSalary)}
                   </span>
                 </div>
               </div>
@@ -69,7 +78,7 @@ const ViewJob = () => {
                 Apply Now
               </button>
               <p className="mt-1 text-gray-600">
-                Posted {moment(job.date).fromNow()}
+                Posted {moment(job?.jobInfo?.postedOn).fromNow()}
               </p>
             </div>
           </div>
@@ -81,7 +90,9 @@ const ViewJob = () => {
               <h2 className="font-bold text-2xl mb-4">Job Description</h2>
               <div
                 className="rich-text"
-                dangerouslySetInnerHTML={{ __html: job.description }}
+                dangerouslySetInnerHTML={{
+                  __html: job?.jobInfo?.jobDescription,
+                }}
               ></div>
               <button className="bg-blue-600 p-2.5 px-10 text-white rounded mt-10">
                 Apply Now
@@ -89,8 +100,8 @@ const ViewJob = () => {
             </div>
 
             {/* right section (more jobs) */}
-            <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">
-              <h2>More jobs from {job.companyId.name}</h2>
+            {/* <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">
+              <h2>More jobs from {job?.company?.companyName}</h2>
               {jobsData
                 .filter(
                   (eachjob) =>
@@ -102,7 +113,7 @@ const ViewJob = () => {
                 .map((job, index) => (
                   <JobCard key={index} job={job} />
                 ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

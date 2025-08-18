@@ -521,6 +521,22 @@
   },
   {
     "ContainingType": "JobPortalWebAPI.Controllers.UserController",
+    "Method": "GetJobById",
+    "RelativePath": "api/User/getJobById/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JobPortalWebAPI.Controllers.UserController",
     "Method": "GetAllSavedJobs",
     "RelativePath": "api/User/savedJobs",
     "HttpMethod": "GET",

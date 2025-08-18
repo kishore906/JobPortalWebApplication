@@ -5,6 +5,7 @@ namespace JobPortalWebAPI.Repositories
 {
     public interface IUserJobRepository
     {
+        Task<object?> GetJobByIdAsync(Guid id);
         Task<bool> SaveJobAsync(string userId, Guid jobId);
         Task<List<ReturnJobDTO>> GetAllSavedJobsAsync(string userId);
         Task<bool> UnSaveJobAsync(string userId, Guid jobId);

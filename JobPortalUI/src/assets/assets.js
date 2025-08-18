@@ -39,6 +39,8 @@ import mobile_logo from "./mobile.svg";
 import google_logo from "./google.png";
 import resume_icon from "./resume.png";
 import active_job_icon from "./active_job.png";
+import down_arrow from "./down_arrow.png";
+import up_arrow from "./up-arrow.png";
 
 export const assets = {
   logo,
@@ -82,11 +84,14 @@ export const assets = {
   google_logo,
   resume_icon,
   active_job_icon,
+  down_arrow,
+  up_arrow,
 };
 
 export const JobCategories = [
   "Programming",
   "Web Development",
+  "Full Stack Development",
   "Analyst",
   "Data Science",
   "Designing",
@@ -109,6 +114,22 @@ export const JobLocations = [
   "California, USA",
   "Chennai, India",
   "New York, USA",
+];
+
+export const JobType = [
+  "FullTime",
+  "PartTime",
+  "Casual",
+  "Contract",
+  "Internship",
+];
+
+export const JobLevel = [
+  "Entry level",
+  "Mid-Senior level",
+  "Senior level",
+  "Internship",
+  "Executive",
 ];
 
 // Sample data for Manage Jobs Page

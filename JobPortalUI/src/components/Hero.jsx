@@ -1,6 +1,13 @@
 import { assets } from "../assets/assets";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setSearchQueryAndJobLocation } from "../features/slice/jobSearchSlice";
 
 const Hero = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [jobLocation, setJobLocation] = useState("");
+  const dispatch = useDispatch();
+
   return (
     <div className="container mx-auto px-4 2xl:px-20 my-10">
       <div className="bg-gradient-to-r from-purple-800 to-purple-950 text-white py-16 text-center mx-2 rounded-xl">
@@ -23,6 +30,8 @@ const Hero = () => {
               type="text"
               className="max-sm:text-xs p-2 rounded outline-none w-full"
               placeholder="Search for jobs.."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="flex items-center">
@@ -35,9 +44,18 @@ const Hero = () => {
               type="text"
               className="max-sm:text-xs p-2 rounded outline-none w-full"
               placeholder="Location.."
+              value={jobLocation}
+              onChange={(e) => setJobLocation(e.target.value)}
             />
           </div>
-          <button className="bg-blue-600 px-6 py-2 rounded text-white m-1">
+          <button
+            className="bg-blue-600 px-6 py-2 rounded text-white m-1"
+            onClick={() =>
+              dispatch(
+                setSearchQueryAndJobLocation({ searchQuery, jobLocation })
+              )
+            }
+          >
             Search
           </button>
         </div>
