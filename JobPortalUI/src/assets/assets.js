@@ -38,6 +38,7 @@ import company_logo from "./company_icon.png";
 import mobile_logo from "./mobile.svg";
 import google_logo from "./google.png";
 import resume_icon from "./resume.png";
+import active_job_icon from "./active_job.png";
 
 export const assets = {
   logo,
@@ -80,6 +81,7 @@ export const assets = {
   mobile_logo,
   google_logo,
   resume_icon,
+  active_job_icon,
 };
 
 export const JobCategories = [

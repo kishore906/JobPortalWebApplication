@@ -24,6 +24,7 @@ import AuthRoute from "./components/AuthRoute";
 import ViewJobAndApplications from "./pages/ViewJobAndApplications";
 import EditJob from "./pages/EditJob";
 import JobInfoAndUserApplications from "./pages/JobInfoAndUserApplications";
+import AdminJobViewWithApplications from "./pages/Admin/AdminJobViewWithApplications";
 
 function App() {
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
@@ -97,6 +98,10 @@ function App() {
             <Route path="all-users" element={<AllUsers />} />
             <Route path="all-companies" element={<AllCompanies />} />
             <Route path="all-jobs" element={<AllJobs />} />
+            <Route
+              path="jobInfoAndUsersApplications/:id"
+              element={<AdminJobViewWithApplications />}
+            />
           </Route>
         </Route>
       </Routes>

@@ -374,6 +374,16 @@
   },
   {
     "ContainingType": "JobPortalWebAPI.Controllers.CompanyController",
+    "Method": "GetCompanyStats",
+    "RelativePath": "api/Company/getCompanyStats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JobPortalWebAPI.Controllers.CompanyController",
     "Method": "GetJob",
     "RelativePath": "api/Company/getJob/{id}",
     "HttpMethod": "GET",

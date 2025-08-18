@@ -99,7 +99,9 @@ namespace JobPortalWebAPI.Repositories
                             email = ja.UserProfile.ApplicationUser!.Email,
                             location = ja.UserProfile.Location,
                             mobileNumber = ja.UserProfile.MobileNumber,
-                            resumePath = ja.UserProfile.ResumeFilePath
+                            resumePath = ja.JobResume,
+                            status = ja.Status,
+                            appliedOn= ja.AppliedOn,
                         }
                     )
             };

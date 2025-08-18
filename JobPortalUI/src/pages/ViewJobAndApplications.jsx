@@ -49,7 +49,7 @@ const ViewJobAndApplications = () => {
       )}
 
       {jobs.length > 0 && (
-        <table className="w-full max-w-6xl bg-white border border-gray-200 max-sm:text-sm">
+        <table className="w-full max-w-7xl bg-white border border-gray-200 max-sm:text-sm">
           <thead>
             <tr className="border-b border-gray-200">
               <th className="py-2 px-4 text-left">#</th>

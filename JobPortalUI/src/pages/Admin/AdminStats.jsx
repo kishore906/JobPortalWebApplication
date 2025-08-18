@@ -1,6 +1,25 @@
 import { assets } from "../../assets/assets";
+import { useState, useEffect } from "react";
+import Loading from "../../components/Loading";
+import { useGetStatsQuery } from "../../features/api/adminApi";
 
 const AdminStats = () => {
+  const [stats, setStats] = useState(null);
+  const { isLoading, isSuccess, error, data } = useGetStatsQuery();
+
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+    }
+
+    if (isSuccess && data) {
+      console.log(data);
+      setStats(data);
+    }
+  }, [error, isSuccess, data]);
+
+  if (isLoading) return <Loading />;
+
   return (
     <div className="p-5">
       <div className="flex flex-col items-center md:flex-row gap-3">
@@ -11,7 +30,7 @@ const AdminStats = () => {
             className="w-14.5"
           />
           <div className="text-center">
-            <p className="font-bold text-5xl">25</p>
+            <p className="font-bold text-5xl">{stats?.companyCount}</p>
             <p className="text-sm font-bold">Companies</p>
           </div>
         </div>
@@ -22,7 +41,7 @@ const AdminStats = () => {
             className="w-12"
           />
           <div className="text-center">
-            <p className="font-bold text-5xl">25</p>
+            <p className="font-bold text-5xl">{stats?.usersCount}</p>
             <p className="text-sm font-bold">Users</p>
           </div>
         </div>
@@ -33,8 +52,8 @@ const AdminStats = () => {
             className="w-13.5"
           />
           <div className="text-center">
-            <p className="font-bold text-5xl">25</p>
-            <p className="text-sm font-bold">Jobs</p>
+            <p className="font-bold text-5xl">{stats?.activeJobsCount}</p>
+            <p className="text-sm font-bold">Active Jobs</p>
           </div>
         </div>
       </div>

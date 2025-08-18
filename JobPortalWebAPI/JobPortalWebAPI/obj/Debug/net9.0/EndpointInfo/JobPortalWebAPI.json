@@ -744,6 +744,18 @@
         }
       }
     },
+    "/api/Company/getCompanyStats": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/User/saveJob": {
       "post": {
         "tags": [

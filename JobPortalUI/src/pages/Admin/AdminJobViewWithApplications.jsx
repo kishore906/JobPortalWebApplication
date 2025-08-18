@@ -1,12 +1,11 @@
-import ViewJobInDashboard from "./ViewJobInDashboard";
-import ViewApplications from "./ViewApplications";
+import JobInfo from "./JobInfo";
+import ApplicationsList from "./ApplicationsList";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import Loading from "../components/Loading";
-import { useGetJobByIdQuery } from "../features/api/companyApi";
+import Loading from "../../components/Loading";
+import { useGetJobByIdQuery } from "../../features/api/adminApi";
 
-const JobInfoAndUserApplications = () => {
+const AdminJobViewWithApplications = () => {
   const [activeBtn, setActiveBtn] = useState("jobInfo");
   const [job, setJob] = useState(null);
 
@@ -16,7 +15,6 @@ const JobInfoAndUserApplications = () => {
   useEffect(() => {
     if (error) {
       console.log(error);
-      toast.error(error?.data?.message);
     }
 
     if (isSuccess && data) {
@@ -49,12 +47,12 @@ const JobInfoAndUserApplications = () => {
       </div>
 
       {activeBtn === "jobInfo" ? (
-        <ViewJobInDashboard job={job?.jobInfo} />
+        <JobInfo job={job?.jobInfo} />
       ) : (
-        <ViewApplications applications={job?.applications} jobId={id} />
+        <ApplicationsList applications={job?.applicants} />
       )}
     </div>
   );
 };
 
-export default JobInfoAndUserApplications;
+export default AdminJobViewWithApplications;

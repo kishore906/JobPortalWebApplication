@@ -118,7 +118,7 @@ namespace JobPortalWebAPI.Controllers
 
             var result = await adminRepository.DeleteJobAsync(id);
             if (!result) return NotFound(new { message = "No Job Found."});
-            return Ok(new { message = "Jon deleted successfully."});
+            return Ok(new { message = "Job deleted successfully."});
         }
 
         [HttpGet("getStats")]

@@ -23,20 +23,30 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
               to={
                 user?.role === "User"
                   ? "/applications"
+                  : user?.role === "Admin"
+                  ? "/adminDashboard"
                   : "/dashboard/manage-jobs"
               }
               className="font-bold"
             >
-              {user?.role === "User" ? "Applied" : "Posted"} Jobs
+              {user?.role === "User"
+                ? "Applied Jobs"
+                : user?.role === "Admin"
+                ? "Dashboard"
+                : "Posted Jobs"}
             </Link>
             <p className="max-sm:hidden font-bold">|</p>
             <p className="max-sm:hidden font-bold">
-              Hi, {user?.role === "User" ? user.fullName : user?.companyName}
+              Hi,{" "}
+              {user?.role === "User" || user?.role === "Admin"
+                ? user.fullName
+                : user?.companyName}
             </p>
             <div className="relative group">
               <img
                 src={
-                  user?.role === "User" && user?.profileImage
+                  user?.role === "User" ||
+                  (user?.role === "Admin" && user?.profileImage)
                     ? `https://localhost:7091/${user?.profileImage}`
                     : user?.role === "Recruiter" && user?.companyImage
                     ? `https://localhost:7091/${user?.companyImage}`

@@ -192,5 +192,20 @@ namespace JobPortalWebAPI.Controllers
 
             return Ok(new { message = "Status updated successfully." });
         }
+
+        [HttpGet]
+        [Authorize(Roles ="Recruiter")]
+        [Route("getCompanyStats")]
+        public async Task<IActionResult> GetCompanyStats()
+        {
+            // Get current logged-in user's ApplicationUserId (string)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "Authentication required. Please login." });
+
+            var (JobsPostedCount, ActiveJobsCount) = await jobRepository.GetCompanyStats(userId);
+
+            return Ok(new { JobsPostedCount, ActiveJobsCount });
+        }
     }
 }

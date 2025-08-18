@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import DOMPurify from "dompurify";
 import {
-  useGetJobIdQuery,
+  useGetJobByIdQuery,
   useUpdateJobMutation,
 } from "../features/api/companyApi";
 import { JobCategories, JobLocations } from "../assets/assets";
@@ -24,7 +24,7 @@ const EditJob = () => {
   const quillRef = useRef(null);
 
   const { id } = useParams();
-  const { error: jobErr, data: jobRes } = useGetJobIdQuery(id);
+  const { error: jobErr, data: jobRes } = useGetJobByIdQuery(id);
   const [updateJob, { isLoading, isSuccess, error, data }] =
     useUpdateJobMutation();
   const navigate = useNavigate();

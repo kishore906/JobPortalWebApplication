@@ -1,7 +1,7 @@
 import moment from "moment";
 import kconvert from "k-convert";
 
-const ViewJobInDashboard = ({ job }) => {
+const JobInfo = ({ job }) => {
   return (
     <div className="mt-10 w-full max-w-4xl">
       <div className="flex items-center flex-col md:flex-row">
@@ -57,4 +57,4 @@ const ViewJobInDashboard = ({ job }) => {
   );
 };
 
-export default ViewJobInDashboard;
+export default JobInfo;

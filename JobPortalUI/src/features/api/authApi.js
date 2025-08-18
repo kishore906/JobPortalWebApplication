@@ -63,7 +63,6 @@ export const authApi = createApi({
           body: updatedFields, // sending updated profile data
         };
       },
-
       // runs before mutation(optimistic updates go here) is sent to server
       async onQueryStarted(updatedFields, { dispatch, queryFulfilled }) {
         // wait for API response

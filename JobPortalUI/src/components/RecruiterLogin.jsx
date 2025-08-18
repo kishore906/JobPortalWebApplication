@@ -151,13 +151,17 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
           Recruiter {state}
         </h1>
         {state === "Login" ? (
-          <p className="text-sm">🤗 Welcoma back!! Please login to continue</p>
+          <p className="text-sm text-center">
+            🤗 Welcoma back!! Please login to continue
+          </p>
         ) : (
-          <p className="text-sm">👋 Hello!! Please sign up to continue</p>
+          <p className="text-sm text-center">
+            👋 Hello!! Please sign up to continue
+          </p>
         )}
         {state === "Sign Up" && step == 2 ? (
           <>
-            <div className="flex items-center gap-4 my-10">
+            <div className="flex items-center gap-4 my-10 w-80">
               <label htmlFor="image">
                 <img
                   src={
@@ -192,7 +196,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                   <img src={assets.person_icon} alt="person_icon" />
                   <input
                     type="text"
-                    className="outline-none text-sm"
+                    className="outline-none text-sm w-80"
                     name="companyName"
                     onChange={handleChange}
                     value={formFields.companyName}
@@ -211,7 +215,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
               <img src={assets.email_icon} alt="email_icon" />
               <input
                 type="email"
-                className="outline-none text-sm"
+                className="outline-none text-sm w-80"
                 name="email"
                 onChange={handleChange}
                 value={formFields.email}
@@ -227,7 +231,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
               <img src={assets.lock_icon} alt="lock_icon" />
               <input
                 type="password"
-                className="outline-none text-sm"
+                className="outline-none text-sm w-80"
                 name="password"
                 onChange={handleChange}
                 value={formFields.password}
@@ -245,7 +249,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
                   <img src={assets.location_icon} alt="location_icon" />
                   <input
                     type="text"
-                    className="outline-none text-sm"
+                    className="outline-none text-sm w-80"
                     name="companyLocation"
                     onChange={handleChange}
                     value={formFields.companyLocation}

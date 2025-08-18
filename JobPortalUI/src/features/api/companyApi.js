@@ -26,7 +26,7 @@ export const companyApi = createApi({
       },
       invalidatesTags: [{ type: "Job", id: "LIST" }], // Invalidate the list so it refetches
     }),
-    getJobId: builder.query({
+    getJobById: builder.query({
       query: (id) => `/getJob/${id}`,
       providesTags: (result, error, id) => [{ type: "Job", id }], // single job
     }),
@@ -66,14 +66,43 @@ export const companyApi = createApi({
         { type: "Job", id: "LIST" },
       ],
     }),
+    updateApplicationStatus: builder.mutation({
+      query({ jobId, appId, status }) {
+        return {
+          url: `/updateJobApplicationStatus/${appId}`,
+          method: "PUT",
+          body: status,
+        };
+      },
+      // Directly update cache for instant UI feedback
+      async onQueryStarted(
+        { jobId, appId, status },
+        { dispatch, queryFulfilled }
+      ) {
+        await queryFulfilled;
+        // Update the cached job immediately
+        dispatch(
+          companyApi.util.updateQueryData("getJobById", jobId, (draft) => {
+            const app = draft.applications.find((a) => a.id === appId);
+            if (app) app.status = status.status; // update field
+          })
+        );
+      },
+      invalidatesTags: (result, error, id) => [{ type: "Job", id }], // This will trigger any useGetJobByIdQuery(jobId) hook anywhere in your app to refetch
+    }),
+    getCompanyStats: builder.query({
+      query: () => `/getCompanyStats`,
+    }),
   }),
 });
 
 export const {
   useGetAllJobsQuery,
   usePostJobMutation,
-  useGetJobIdQuery,
+  useGetJobByIdQuery,
   useUpdateJobMutation,
   useDeleteJobMutation,
   useUpdateJobStatusMutation,
+  useUpdateApplicationStatusMutation,
+  useGetCompanyStatsQuery,
 } = companyApi;

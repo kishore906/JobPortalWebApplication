@@ -11,5 +11,6 @@ namespace JobPortalWebAPI.Repositories
         Task<object?> GetJobAsync(Guid jobId);
         Task<(bool Success, string Message)> ChangeJobStatusAsync(string userId, Guid jobId);
         Task<bool> UpdateJobApplicationStatusAsync(Guid applicationId, string status);
+        Task<(long JobsPostedCount, long ActiveJobsCount)> GetCompanyStats(string companyId);
     }
 }

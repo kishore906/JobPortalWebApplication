@@ -140,5 +140,12 @@ namespace JobPortalWebAPI.Repositories
 
             return true;
         }
+
+        public async Task<(long JobsPostedCount, long ActiveJobsCount)> GetCompanyStats(string companyId)
+        {
+            var jobsPostedCount = await _dbContext.Jobs.Where(j => j.CompanyProfileId == companyId).CountAsync();
+            var activeJobsCount = await _dbContext.Jobs.Where(j => j.CompanyProfileId == companyId && j.JobStatus == "Open").CountAsync();
+            return (jobsPostedCount, activeJobsCount);
+        }
     }
 }

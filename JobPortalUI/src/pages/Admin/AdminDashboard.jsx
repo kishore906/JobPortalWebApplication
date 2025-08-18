@@ -1,7 +1,11 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { assets } from "../../assets/assets";
+import { useSelector } from "react-redux";
+import { useLogout } from "../../customHooks/useLogout";
 
 const AdminDashboard = () => {
+  const { user } = useSelector((state) => state.authResult);
+  const { logout } = useLogout();
   const navigate = useNavigate();
 
   return (
@@ -16,16 +20,27 @@ const AdminDashboard = () => {
             onClick={() => navigate("/")}
           />
           <div className="flex items-center gap-3">
-            <p className="max-sm:hidden font-[700]">Welcome, Admin</p>
+            <p className="max-sm:hidden font-[700]">
+              Welcome, {user?.fullName}
+            </p>
             <div className="relative group">
               <img
-                src={assets.company_icon}
-                alt="company_icon"
+                src={
+                  user?.profileImage
+                    ? `https://localhost:7091/${user?.profileImage}`
+                    : assets.upload_area
+                }
+                alt="avatar_icon"
                 className="w-8 border-2 border-emerald-100 rounded-full"
               />
               <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
                 <ul className="list-none m-0 p-2 bg-white rounded-md shadow text-sm">
-                  <li className="py-1 px-2 cursor-pointer pr-10">Logout</li>
+                  <li
+                    className="py-1 px-2 cursor-pointer pr-10"
+                    onClick={() => logout()}
+                  >
+                    Logout
+                  </li>
                 </ul>
               </div>
             </div>
