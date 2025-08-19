@@ -67,7 +67,7 @@ const EditProfile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (user?.role === "User") {
+    if (user?.role === "User" || user?.role === "Admin") {
       const userFormData = new FormData();
 
       userFormData.append("fullName", fields.name);
@@ -133,16 +133,22 @@ const EditProfile = () => {
 
     if (isSuccess && data) {
       setFields({
-        name: user?.role === "User" ? data.fullName : data.companyName,
-        email: user?.role === "User" ? data.email : data.companyEmail,
+        name:
+          user?.role === "User" || user?.role === "Admin"
+            ? data.fullName
+            : data.companyName,
+        email:
+          user?.role === "User" || user?.role === "Admin"
+            ? data.email
+            : data.companyEmail,
         location:
-          user?.role === "User"
+          user?.role === "User" || user?.role === "Admin"
             ? data?.location
               ? data?.location
               : ""
             : data.companyLocation,
         image:
-          user?.role === "User"
+          user?.role === "User" || user?.role === "Admin"
             ? data?.profileImagePath
               ? `https://localhost:7091/${data?.profileImagePath}`
               : null
@@ -150,7 +156,8 @@ const EditProfile = () => {
             ? `https://localhost:7091/${data?.companyImagePath}`
             : null,
       });
-      user?.role === "User" && setMobileNumber(data?.mobileNumber);
+      (user?.role === "User" || user?.role === "Admin") &&
+        setMobileNumber(data?.mobileNumber);
       user?.role === "User" &&
         setExistingResumeUrl(
           data?.resumePath ? `https://localhost:7091/${data?.resumePath}` : null
@@ -246,7 +253,7 @@ const EditProfile = () => {
 
             <div className="flex items-center gap-4 my-5">
               <img
-                src={fields.image ? fields.image : assets.upload_area}
+                src={fields?.image ? fields?.image : assets.upload_area}
                 alt="upload_img"
                 className="w-16 rounded-full"
               />

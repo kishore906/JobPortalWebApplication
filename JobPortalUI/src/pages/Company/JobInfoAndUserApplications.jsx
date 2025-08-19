@@ -3,8 +3,8 @@ import ViewApplications from "./ViewApplications";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import Loading from "../components/Loading";
-import { useGetJobByIdQuery } from "../features/api/companyApi";
+import Loading from "../../components/Loading";
+import { useGetJobByIdQuery } from "../../features/api/companyApi";
 
 const JobInfoAndUserApplications = () => {
   const [activeBtn, setActiveBtn] = useState("jobInfo");

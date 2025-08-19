@@ -6,24 +6,24 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Home from "./pages/Home";
 import ViewJob from "./pages/ViewJob";
-import Applications from "./pages/Applications";
+import Applications from "./pages/User/Applications";
 import RecruiterLogin from "./components/RecruiterLogin";
-import Dashboard from "./pages/Dashboard";
-import AddJob from "./pages/AddJob";
-import ManageJobs from "./pages/ManageJobs";
+import Dashboard from "./pages/Company/Dashboard";
+import AddJob from "./pages/Company/AddJob";
+import ManageJobs from "./pages/Company/ManageJobs";
 import UserLogin from "./components/UserLogin";
 import EditProfile from "./pages/EditProfile";
 import EditPassword from "./pages/EditPassword";
-import CompanyStatistics from "./pages/CompanyStatistics";
+import CompanyStatistics from "./pages/Company/CompanyStatistics";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AllUsers from "./pages/Admin/AllUsers";
 import AllCompanies from "./pages/Admin/AllCompanies";
 import AllJobs from "./pages/Admin/AllJobs";
 import AdminStats from "./pages/Admin/AdminStats";
 import AuthRoute from "./components/AuthRoute";
-import ViewJobAndApplications from "./pages/ViewJobAndApplications";
-import EditJob from "./pages/EditJob";
-import JobInfoAndUserApplications from "./pages/JobInfoAndUserApplications";
+import ViewJobAndApplications from "./pages/Company/ViewJobAndApplications";
+import EditJob from "./pages/Company/EditJob";
+import JobInfoAndUserApplications from "./pages/Company/JobInfoAndUserApplications";
 import AdminJobViewWithApplications from "./pages/Admin/AdminJobViewWithApplications";
 
 function App() {
@@ -49,7 +49,15 @@ function App() {
             />
           }
         />
-        <Route path="/viewJob/:id" element={<ViewJob />} />
+        <Route
+          path="/viewJob/:id"
+          element={
+            <ViewJob
+              setShowUserLogin={setShowUserLogin}
+              setShowRecruiterLogin={setShowRecruiterLogin}
+            />
+          }
+        />
         <Route
           path="/applications"
           element={

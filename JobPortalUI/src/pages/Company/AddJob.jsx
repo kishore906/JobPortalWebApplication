@@ -3,8 +3,8 @@ import Quill from "quill";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import DOMPurify from "dompurify";
-import { usePostJobMutation } from "../features/api/companyApi";
-import { JobCategories, JobLocations } from "../assets/assets";
+import { usePostJobMutation } from "../../features/api/companyApi";
+import { JobCategories, JobLocations } from "../../assets/assets";
 
 const AddJob = () => {
   const [job, setJob] = useState({

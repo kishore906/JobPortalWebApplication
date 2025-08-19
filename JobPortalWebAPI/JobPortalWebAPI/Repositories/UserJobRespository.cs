@@ -26,6 +26,7 @@ namespace JobPortalWebAPI.Repositories
                              .ThenInclude(j => j.CompanyProfile)
                          .Select(sj => new ReturnJobDTO
                          {
+                             Id = sj.JobId,
                              JobTitle = sj.Job!.JobTitle,
                              JobType = sj.Job.JobType,
                              JobLocation = sj.Job.JobLocation,
@@ -100,37 +101,50 @@ namespace JobPortalWebAPI.Repositories
 
             await _dbContext.JobApplications.AddAsync(jobApplication);
             var rows = await _dbContext.SaveChangesAsync();
+
+            // delete the job from saved list of user
+            var savedJob = await _dbContext.SavedJobs.FirstOrDefaultAsync(a => a.UserProfileId == userId && a.JobId == jobId);
+            if (savedJob != null)
+            {
+                _dbContext.SavedJobs.Remove(savedJob);
+                await _dbContext.SaveChangesAsync();
+            }
             return (rows > 0, "Job application submitted successfully.");
         }
 
-        public async Task<List<ReturnJobDTO>> GetAllAppliedJobsAsync(string userId)
+        public async Task<List<ReturnAppliedJobsDTO>> GetAllAppliedJobsAsync(string userId)
         {
             var appliedJobs = await _dbContext.JobApplications
                     .Where(a => a.UserProfileId == userId)
                     .Include(a => a.Job)
                         .ThenInclude(j => j.CompanyProfile)
-                    .Select(a => new ReturnJobDTO
-                    {
-                        JobTitle = a.Job != null ? a.Job.JobTitle : null,
-                        JobType = a.Job != null ? a.Job.JobType : null,
-                        JobLocation = a.Job != null ? a.Job.JobLocation : null,
-                        Company = a.Job != null && a.Job.CompanyProfile != null
-                            ? new ReturnCompanyDTO
+                    .Select(a => new ReturnAppliedJobsDTO
+                        {
+                             Id = a.Id,
+                            Status = a.Status,
+                            AppliedOn = a.AppliedOn,
+                            JobInfo= new ReturnJobDTO
                             {
-                                CompanyName = a.Job.CompanyProfile.CompanyName,
-                                CompanyImagePath = a.Job.CompanyProfile.CompanyImagePath!
+                                JobTitle = a.Job != null ? a.Job.JobTitle : null,
+                                JobType = a.Job != null ? a.Job.JobType : null,
+                                JobLocation = a.Job != null ? a.Job.JobLocation : null,
+                                Company = a.Job != null && a.Job.CompanyProfile != null
+                                ? new ReturnCompanyDTO
+                                {
+                                    CompanyName = a.Job.CompanyProfile.CompanyName,
+                                    CompanyImagePath = a.Job.CompanyProfile.CompanyImagePath!
+                                }
+                                : null
                             }
-                            : null
-                    })
-                    .ToListAsync();
+                        }).ToListAsync();
 
             return appliedJobs;
         }
 
-        public async Task<bool> CancelApplicationAsync(string userId, Guid jobId)
+        public async Task<bool> CancelApplicationAsync(string userId, Guid appId)
         {
             var application = await _dbContext.JobApplications
-                    .FirstOrDefaultAsync(a => a.UserProfileId == userId && a.JobId == jobId);
+                    .FirstOrDefaultAsync(a => a.UserProfileId == userId && a.Id == appId);
 
             if (application == null)
                 return false;
@@ -151,6 +165,10 @@ namespace JobPortalWebAPI.Repositories
 
             // Base query: include related CompanyProfile
             var query = _dbContext.Jobs.Where(j => j.JobStatus == "Open").Include(j => j.CompanyProfile).AsQueryable();
+
+            // Total count before pagination
+            var totalJobs = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalJobs / (double)pageSize);
 
             // Initial load (no search, no filters)
             if (string.IsNullOrWhiteSpace(searchQuery) &&
@@ -184,52 +202,49 @@ namespace JobPortalWebAPI.Repositories
                             })
                             .ToListAsync();
 
-                    var totalpages = (int)Math.Ceiling(latestJobs.Count / (double)pageSize);
-
                     return new
                             {
-                                totalJobs = latestJobs.Count,
-                                totalPages = totalpages,
+                                totalJobs,
+                                totalPages,
                                 latestJobs
                             };
                     }
 
-            // Apply search (JobTitle contains search term)
-            if (!string.IsNullOrWhiteSpace(searchQuery))
-            {
-                query = query.Where(j => j.JobTitle.Contains(searchQuery));
-            }
+                    // Apply search (JobTitle contains search term)
+                    if (!string.IsNullOrWhiteSpace(searchQuery))
+                    {
+                        query = query.Where(j => j.JobTitle.Contains(searchQuery));
+                    }
 
-            // Apply filters (exact matches using string.Equals for case-insensitive)
-            if (!string.IsNullOrWhiteSpace(jobLocation))
-            {
-                query = query.Where(j => j.JobLocation.Contains(jobLocation));
-            }
+                    // Apply filters (exact matches using string.Equals for case-insensitive)
+                    if (!string.IsNullOrWhiteSpace(jobLocation))
+                    {
+                        query = query.Where(j => j.JobLocation.Contains(jobLocation));
+                    }
 
-            if (!string.IsNullOrWhiteSpace(jobCategory))
-            {
-                query = query.Where(j => j.JobCategory != null &&
-                                         j.JobCategory.ToLower() == jobCategory.ToLower());
-            }
+                    if (!string.IsNullOrWhiteSpace(jobCategory))
+                    {
+                        query = query.Where(j => j.JobCategory != null &&
+                                                 j.JobCategory.ToLower() == jobCategory.ToLower());
+                    }
 
-            if (!string.IsNullOrWhiteSpace(jobLevel))
-            {
-                query = query.Where(j => j.JobLevel != null &&
-                                         j.JobLevel.ToLower() == jobLevel.ToLower());
-            }
+                    if (!string.IsNullOrWhiteSpace(jobLevel))
+                    {
+                        query = query.Where(j => j.JobLevel != null &&
+                                                 j.JobLevel.ToLower() == jobLevel.ToLower());
+                    }
 
-            if (!string.IsNullOrWhiteSpace(jobType))
-            {
-                query = query.Where(j => j.JobType != null &&
-                                         j.JobType.ToLower() == jobType.ToLower());
-            }
+                    if (!string.IsNullOrWhiteSpace(jobType))
+                    {
+                        query = query.Where(j => j.JobType != null &&
+                                                 j.JobType.ToLower() == jobType.ToLower());
+                    }
 
-            // Total count before pagination
-            var totalJobs = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalJobs / (double)pageSize);
+             var totalJobsAfterFiltering = await query.CountAsync();
+            var totalPagesAfterFiltering = (int)Math.Ceiling(totalJobsAfterFiltering / (double)pageSize);
 
             // Check if no jobs found
-            if(totalJobs == 0)
+            if (totalJobsAfterFiltering == 0)
             {
                 return new
                 {
@@ -238,38 +253,39 @@ namespace JobPortalWebAPI.Repositories
                 };
             }
 
+
             // Apply pagination (Skip() + Take())
             var jobs = await query
-                                        .OrderByDescending(j => j.PostedOn) // latest first
-                                        .Skip((pageNumber - 1) * pageSize)
-                                        .Take(pageSize)
-                                        .Select(job => new ReturnJobDTO
-                                        {
-                                            Id = job.Id,
-                                            JobTitle = job.JobTitle,
-                                            JobDescription = job.JobDescription,
-                                            JobStatus = job.JobStatus,
-                                            JobType = job.JobType,
-                                            JobSalary = job.JobSalary,
-                                            JobLocation = job.JobLocation,
-                                            JobLevel = job.JobLevel,
-                                            PostedOn = job.PostedOn,
-                                            Company = new ReturnCompanyDTO
+                                            .OrderByDescending(j => j.PostedOn) // latest first
+                                            .Skip((pageNumber - 1) * pageSize)
+                                            .Take(pageSize)
+                                            .Select(job => new ReturnJobDTO
                                             {
-                                                CompanyName = job.CompanyProfile!.CompanyName,
-                                                CompanyLocation = job.CompanyProfile.CompanyLocation,
-                                                CompanyImagePath = job.CompanyProfile.CompanyImagePath,
-                                            }
-                                        })
-                                        .ToListAsync();
+                                                Id = job.Id,
+                                                JobTitle = job.JobTitle,
+                                                JobDescription = job.JobDescription,
+                                                JobStatus = job.JobStatus,
+                                                JobType = job.JobType,
+                                                JobSalary = job.JobSalary,
+                                                JobLocation = job.JobLocation,
+                                                JobLevel = job.JobLevel,
+                                                PostedOn = job.PostedOn,
+                                                Company = new ReturnCompanyDTO
+                                                {
+                                                    CompanyName = job.CompanyProfile!.CompanyName,
+                                                    CompanyLocation = job.CompanyProfile.CompanyLocation,
+                                                    CompanyImagePath = job.CompanyProfile.CompanyImagePath,
+                                                }
+                                            })
+                                            .ToListAsync();
 
-            // return results
-            return new
-            {
-                totalJobs,
-                totalPages,
-                jobs
-            };
+                // return results
+                return new
+                {
+                    totalJobs = totalJobsAfterFiltering,
+                    totalPages = totalPagesAfterFiltering,
+                    jobs
+                };
         }
 
         public async Task<object?> GetJobByIdAsync(Guid jobId)
@@ -297,6 +313,26 @@ namespace JobPortalWebAPI.Repositories
                         }
                     }).FirstOrDefaultAsync();
             return job;
+        }
+
+        public async Task<(bool Saved, bool Applied)> GetSavedOrAppliedAsync(string userId, Guid jobId)
+        {
+            // check whether job is saved or not
+            var savedJob = await _dbContext.SavedJobs.FirstOrDefaultAsync(a => a.UserProfileId == userId && a.JobId == jobId);
+
+            if (savedJob != null)
+            {
+                return (true, false);
+            }
+
+            // check whether job is applied or not
+            var appliedJob = await _dbContext.JobApplications.FirstOrDefaultAsync(japp => japp.UserProfileId == userId && japp.JobId == jobId);
+
+            if (appliedJob != null)
+            {
+                return (false, true);
+            }
+            return (false, false);
         }
     }
 }

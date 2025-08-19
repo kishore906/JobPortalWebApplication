@@ -140,6 +140,21 @@ namespace JobPortalWebAPI.Controllers
             return Ok(new { message = "Application cancelled successfully."});
         }
 
+        // Get Job Saved or Applied Status
+        [HttpGet]
+        [Route("getSavedOrAppliedJobStatus/{id}")]
+        public async Task<IActionResult> GetSavedOrAppliedJobStatus([FromRoute] Guid id)
+        {
+            // Get loggedIn User
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Ok(new { SavedJob = false, AppliedJob = false });
+
+            // call repository method
+            var (SavedJob, AppliedJob) = await userJobRepository.GetSavedOrAppliedAsync(userId, id);
+            return Ok(new { SavedJob, AppliedJob});
+        }
+
         // Search for job and apply filters
         [HttpGet("search")]
         public async Task<IActionResult> SearchJobs(

@@ -13,7 +13,7 @@ export const createBaseQuery = (baseUrl) => {
     const result = await baseQuery(args, api, extraOptions);
 
     // Handle 401 Unauthorized globally
-    if (result.error?.status === 401) {
+    if (result?.error?.status === 401) {
       api.dispatch(setLogoutUser()); // clear Redux auth state
       localStorage.removeItem("user"); // clear localStorage
       window.location.href = "/"; // redirect to home

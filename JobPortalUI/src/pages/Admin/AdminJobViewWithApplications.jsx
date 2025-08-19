@@ -1,14 +1,15 @@
-import JobInfo from "./JobInfo";
+//import JobInfo from "./JobInfo";
 import ApplicationsList from "./ApplicationsList";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { useGetJobByIdQuery } from "../../features/api/adminApi";
+import ViewJobInDashboard from "../Company/ViewJobInDashboard";
 
 const AdminJobViewWithApplications = () => {
   const [activeBtn, setActiveBtn] = useState("jobInfo");
   const [job, setJob] = useState(null);
-
+  console.log(job);
   const { id } = useParams();
   const { isLoading, isSuccess, error, data } = useGetJobByIdQuery(id);
 
@@ -47,7 +48,8 @@ const AdminJobViewWithApplications = () => {
       </div>
 
       {activeBtn === "jobInfo" ? (
-        <JobInfo job={job?.jobInfo} />
+        // <JobInfo job={job?.jobInfo} />
+        <ViewJobInDashboard job={job?.jobInfo} />
       ) : (
         <ApplicationsList applications={job?.applicants} />
       )}

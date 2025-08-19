@@ -9,7 +9,7 @@ export const companyApi = createApi({
     getAllJobs: builder.query({
       query: () => "/getAllJobs",
       providesTags: (result) =>
-        result
+        result.length > 0
           ? [
               { type: "Job", id: "LIST" }, // Provide a tag for the whole list
               ...result.map(({ id }) => ({ type: "Job", id })), // And individual tags for each job

@@ -5,7 +5,7 @@ const ApplicationsList = ({ applications }) => {
   return (
     <div className="container mx-auto p-4">
       {applications?.length === 0 ? (
-        <h2 className="text-3xl font-semibold mt-3">No Applications Yet.</h2>
+        <h2 className="text-2xl font-semibold mt-3">No Applications Yet.</h2>
       ) : (
         <table className="w-full max-w-7xl bg-white border border-gray-200 max-sm:text-sm">
           <thead>
@@ -48,7 +48,21 @@ const ApplicationsList = ({ applications }) => {
                     />
                   </a>
                 </td>
-                <td className="py-2 px-4 max-sm:hidden">{applicant?.status}</td>
+                <td className="py-2 px-4 max-sm:hidden">
+                  <span
+                    className={`
+                      ${
+                        applicant?.status === "Accepted"
+                          ? "bg-green-100"
+                          : applicant?.status === "Rejected"
+                          ? "bg-red-400"
+                          : "bg-blue-100"
+                      }
+                    px-4 py-1.5 rounded`}
+                  >
+                    {applicant?.status}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>

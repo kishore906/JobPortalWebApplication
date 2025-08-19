@@ -1,19 +1,92 @@
 import { useEffect, useState } from "react";
-import { jobsData, assets } from "../assets/assets";
-import { useParams } from "react-router-dom";
+import { assets } from "../assets/assets";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import kconvert from "k-convert";
 import moment from "moment";
+import { toast } from "react-toastify";
 import JobCard from "../components/JobCard";
 import Footer from "../components/Footer";
-import { useGetJobByIdQuery } from "../features/api/userApi";
+import {
+  useGetJobByIdQuery,
+  useSaveJobMutation,
+  useApplyJobMutation,
+  useGetSavedOrAppliedJobStatusQuery,
+  useUnSaveJobMutation,
+} from "../features/api/userApi";
 
-const ViewJob = () => {
+const ViewJob = ({ setShowUserLogin, setShowRecruiterLogin }) => {
   const { id } = useParams();
+  const { isAuthenticated } = useSelector((state) => state.authResult);
   const [job, setJob] = useState(null);
+  const [saJobStatus, setSAJobStaus] = useState(null);
+  const [showUploadResume, setShowUploadResume] = useState(false);
+  const [resume, setResume] = useState(null);
 
-  const { isSuccess, error, data } = useGetJobByIdQuery(id);
+  const navigate = useNavigate();
+
+  const { isLoading, isSuccess, error, data } = useGetJobByIdQuery(id);
+  const [
+    saveJob,
+    {
+      isLoading: saveJobLoading,
+      isSuccess: saveJobSuccess,
+      error: saveJobErr,
+      data: saveJobRes,
+    },
+  ] = useSaveJobMutation();
+  const [
+    applyJob,
+    {
+      isLoading: applyJobLoading,
+      isSuccess: applyJobSuccess,
+      error: applyJobErr,
+      data: applyJobRes,
+    },
+  ] = useApplyJobMutation();
+  const {
+    isSuccess: saJobSuccess,
+    error: saJobErr,
+    data: saJobRes,
+  } = useGetSavedOrAppliedJobStatusQuery(id);
+  const [unSaveJob, { error: unsaveErr, data: unsaveRes }] =
+    useUnSaveJobMutation();
+
+  const handleSaveJob = () => {
+    if (!isAuthenticated) {
+      toast.info("Please Login.");
+      navigate("/");
+    } else {
+      if (saJobStatus?.savedJob) {
+        console.log("inside unsave");
+        //unsave
+        unSaveJob(id);
+      } else {
+        saveJob({ jobId: id });
+      }
+    }
+  };
+
+  const handleApplyJob = () => {
+    if (!isAuthenticated) {
+      toast.info("Please Login.");
+      navigate("/");
+    } else {
+      setShowUploadResume(true);
+    }
+  };
+
+  const handleFinalSubmit = (e) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append("jobId", id);
+    data.append("jobResume", resume);
+
+    applyJob(data);
+  };
 
   useEffect(() => {
     if (error) {
@@ -21,14 +94,64 @@ const ViewJob = () => {
     }
 
     if (isSuccess && data) {
-      console.log(data);
+      //console.log(data);
       setJob(data);
     }
   }, [error, isSuccess, data]);
 
-  return job ? (
+  useEffect(() => {
+    if (saveJobErr) {
+      console.log(saveJobErr);
+    }
+
+    if (saveJobSuccess && saveJobRes) {
+      console.log(saveJobRes);
+      toast.success(saveJobRes.message);
+    }
+  }, [saveJobErr, saveJobSuccess, saveJobRes]);
+
+  useEffect(() => {
+    if (applyJobErr) {
+      console.log(applyJobErr);
+    }
+
+    if (applyJobSuccess && applyJobRes) {
+      //console.log(applyJobRes);
+      toast.success(applyJobRes.message);
+      setShowUploadResume(false);
+      navigate("/");
+    }
+  }, [applyJobErr, applyJobSuccess, applyJobRes, navigate]);
+
+  useEffect(() => {
+    if (saJobErr) {
+      console.log(saJobErr);
+    }
+
+    if (saJobSuccess && saJobRes) {
+      console.log(saJobRes);
+      setSAJobStaus(saJobRes);
+    }
+  }, [saJobErr, saJobSuccess, saJobRes]);
+
+  useEffect(() => {
+    if (unsaveErr) {
+      console.log(unsaveErr);
+    }
+
+    if (unsaveRes) {
+      toast.success(unsaveRes.message);
+    }
+  }, [unsaveErr, unsaveRes]);
+
+  if (isLoading) return <Loading />;
+
+  return (
     <>
-      <Navbar />
+      <Navbar
+        setShowUserLogin={setShowUserLogin}
+        setShowRecruiterLogin={setShowRecruiterLogin}
+      />
 
       <div className="min-h-screen flex flex-col py-10 container mx-auto px-4 2xl:px-20">
         <div className="bg-white text-black rounded-lg w-full">
@@ -71,11 +194,29 @@ const ViewJob = () => {
 
             {/* Apply now button div */}
             <div className="flex flex-col justify-center text-end text-sm max-md:mx-auto max-md:text-center">
-              <button className="bg-gray-300 p-2.5 px-10 mb-3 rounded">
-                🔖 Save
-              </button>
-              <button className="bg-blue-600 p-2.5 px-10 text-white rounded">
-                Apply Now
+              {saJobStatus?.savedJob && !saJobStatus?.appliedJob ? (
+                <button
+                  className="bg-gray-300 p-2.5 px-10 mb-3 rounded"
+                  disabled={saveJobLoading}
+                  onClick={handleSaveJob}
+                >
+                  🔖 Saved
+                </button>
+              ) : !saJobStatus?.appliedJob ? (
+                <button
+                  className="bg-gray-300 p-2.5 px-10 mb-3 rounded"
+                  disabled={saveJobLoading}
+                  onClick={handleSaveJob}
+                >
+                  🔖 Save
+                </button>
+              ) : null}
+              <button
+                className="bg-blue-600 p-2.5 px-10 text-white rounded"
+                disabled={saJobStatus?.appliedJob || applyJobLoading}
+                onClick={handleApplyJob}
+              >
+                {saJobStatus?.appliedJob ? "Applied" : "Apply Now"}
               </button>
               <p className="mt-1 text-gray-600">
                 Posted {moment(job?.jobInfo?.postedOn).fromNow()}
@@ -94,9 +235,6 @@ const ViewJob = () => {
                   __html: job?.jobInfo?.jobDescription,
                 }}
               ></div>
-              <button className="bg-blue-600 p-2.5 px-10 text-white rounded mt-10">
-                Apply Now
-              </button>
             </div>
 
             {/* right section (more jobs) */}
@@ -118,10 +256,55 @@ const ViewJob = () => {
         </div>
       </div>
 
+      {showUploadResume && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
+          <form
+            className="relative bg-white p-10 rounded-xl text-slate-500"
+            onSubmit={handleFinalSubmit}
+          >
+            <h1 className="text-center text-2xl text-neutral-700 font-medium">
+              Please upload resume
+            </h1>
+
+            <div className="my-10">
+              <label htmlFor="resume" className="flex items-center">
+                <img
+                  src={assets.resume_icon}
+                  alt="upload_resume_img"
+                  className="w-16 rounded-full"
+                />
+                <input
+                  type="file"
+                  id="resume"
+                  name="resume"
+                  accept=".pdf"
+                  onChange={(e) => setResume(e.target.files[0])}
+                  required
+                />
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="bg-blue-600 w-40 text-white py-2 rounded-full mt-4 block mx-auto"
+              disabled={applyJobLoading}
+            >
+              Apply
+            </button>
+
+            {/* Close Icon */}
+            <img
+              className="absolute top-5 right-5 cursor-pointer"
+              src={assets.cross_icon}
+              alt="close_icon"
+              onClick={() => setShowUploadResume(false)}
+            />
+          </form>
+        </div>
+      )}
+
       <Footer />
     </>
-  ) : (
-    <Loading />
   );
 };
 

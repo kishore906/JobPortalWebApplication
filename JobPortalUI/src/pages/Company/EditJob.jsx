@@ -6,9 +6,9 @@ import DOMPurify from "dompurify";
 import {
   useGetJobByIdQuery,
   useUpdateJobMutation,
-} from "../features/api/companyApi";
-import { JobCategories, JobLocations } from "../assets/assets";
-import Loading from "../components/Loading";
+} from "../../features/api/companyApi";
+import { JobCategories, JobLocations } from "../../assets/assets";
+import Loading from "../../components/Loading";
 
 const EditJob = () => {
   const [job, setJob] = useState({

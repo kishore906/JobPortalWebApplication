@@ -335,7 +335,7 @@ namespace JobPortalWebAPI.Controllers
             var role = User.FindFirstValue(ClaimTypes.Role);
             
             var user = new ApplicationUser();
-
+            Console.WriteLine("role:" + role);
             if(role == "User" || role == "Admin")
             {
                  user = await userManager.Users

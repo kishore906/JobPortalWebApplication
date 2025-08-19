@@ -5,11 +5,18 @@ import {
   useDeleteJobMutation,
   useGetAllJobsQuery,
   useUpdateJobStatusMutation,
-} from "../features/api/companyApi";
-import Loading from "../components/Loading";
+} from "../../features/api/companyApi";
+import Loading from "../../components/Loading";
+import SearchReusable from "./SearchReusable";
 import { toast } from "react-toastify";
+import filterJobs from "../../utils/filterFunction";
 
 const ManageJobs = () => {
+  const [jobs, setJobs] = useState([]);
+  const [noJobsMsg, setNoJobdMsg] = useState("");
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const navigate = useNavigate();
+
   const { isLoading, isSuccess, error, data } = useGetAllJobsQuery();
   const [
     deleteJob,
@@ -23,9 +30,16 @@ const ManageJobs = () => {
       data: statusUpdateres,
     },
   ] = useUpdateJobStatusMutation();
-  const [jobs, setJobs] = useState([]);
-  const [noJobsMsg, setNoJobdMsg] = useState("");
-  const navigate = useNavigate();
+
+  const handleFilter = (filters) => {
+    const filteredJobs = filterJobs(jobs, filters);
+    setFilteredJobs(filteredJobs);
+  };
+
+  const handleReset = () => {
+    const allJobs = filterJobs(jobs, {});
+    setFilteredJobs(allJobs);
+  };
 
   useEffect(() => {
     if (error) {
@@ -37,6 +51,7 @@ const ManageJobs = () => {
         setNoJobdMsg(data.message);
       } else {
         setJobs(data);
+        setFilteredJobs(data);
       }
     }
   }, [error, isSuccess, data]);
@@ -65,11 +80,13 @@ const ManageJobs = () => {
 
   return (
     <div className="container p-4 max-w-7xl">
+      <SearchReusable onFilter={handleFilter} onReset={handleReset} />
+
       <div className="overflow-x-auto">
         {noJobsMsg && (
-          <h3 className="text-center text-2xl font-bold">{noJobsMsg}</h3>
+          <h3 className="text-center text-2xl font-bold mt-5">{noJobsMsg}</h3>
         )}
-        {jobs.length > 0 && (
+        {filteredJobs?.length > 0 ? (
           <table className="min-w-full bg-white border border-gray-200 max-sm:text-sm">
             <thead>
               <tr className="border-b border-gray-200">
@@ -80,17 +97,17 @@ const ManageJobs = () => {
                 <th className="py-2 px-4 text-left max-sm:hidden">Job Level</th>
                 <th className="py-2 px-4 text-left max-sm:hidden">Date</th>
                 <th className="py-2 px-4 text-left">Status</th>
-                <th className="py-2 px-4 text-left">Actions</th>
+                <th className="py-2 px-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {jobs.map((job, index) => (
+              {filteredJobs?.map((job, index) => (
                 <tr key={index} className="border-b border-gray-200">
                   <td className="py-3 px-4 max-sm:hidden">{index + 1}</td>
                   <td className="py-3 px-4">{job.jobTitle}</td>
-                  <td className="py-3 px-4 max-sm:hidden">{job.jobLocation}</td>
-                  <td className="py-3 px-4 text-center">{job.jobType}</td>
-                  <td className="py-3 px-4 text-center">{job.jobLevel}</td>
+                  <td className="py-3 px-4">{job.jobLocation}</td>
+                  <td className="py-3 px-4 max-sm:hidden">{job.jobType}</td>
+                  <td className="py-3 px-4 max-sm:hidden">{job.jobLevel}</td>
                   <td className="py-3 px-4 max-sm:hidden">
                     {moment(job.postedDate).format("ll")}
                   </td>
@@ -138,6 +155,8 @@ const ManageJobs = () => {
               ))}
             </tbody>
           </table>
+        ) : (
+          <h2 className="text-2xl font-semibold">No Jobs Found.</h2>
         )}
 
         <div className="mt-4 flex justify-end">

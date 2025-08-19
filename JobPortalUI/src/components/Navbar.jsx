@@ -30,7 +30,7 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
               className="font-bold"
             >
               {user?.role === "User"
-                ? "Applied Jobs"
+                ? "Saved / Applied Jobs"
                 : user?.role === "Admin"
                 ? "Dashboard"
                 : "Posted Jobs"}

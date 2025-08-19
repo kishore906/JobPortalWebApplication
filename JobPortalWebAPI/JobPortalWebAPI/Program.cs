@@ -92,10 +92,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     //context.Request.Headers.Authorization = $"Bearer {token}";
 
                     // Log for dev
-                    if (builder.Environment.IsDevelopment())
-                    {
-                        Console.WriteLine($"JWT from cookie: {token}");
-                    }
+                    //if (builder.Environment.IsDevelopment())
+                    //{
+                    //    Console.WriteLine($"JWT from cookie: {token}");
+                    //}
                 }
                 return Task.CompletedTask;
             },

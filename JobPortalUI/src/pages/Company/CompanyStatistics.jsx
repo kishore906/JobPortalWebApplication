@@ -1,7 +1,7 @@
-import { assets } from "../assets/assets";
+import { assets } from "../../assets/assets";
 import { useState, useEffect } from "react";
-import Loading from "../components/Loading";
-import { useGetCompanyStatsQuery } from "../features/api/companyApi";
+import Loading from "../../components/Loading";
+import { useGetCompanyStatsQuery } from "../../features/api/companyApi";
 
 const CompanyStatistics = () => {
   const [stats, setStats] = useState(null);

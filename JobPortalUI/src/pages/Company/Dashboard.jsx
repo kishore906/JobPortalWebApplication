@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { assets } from "../assets/assets";
-import { useLogout } from "../customHooks/useLogout";
+import { assets } from "../../assets/assets";
+import { useLogout } from "../../customHooks/useLogout";
 
 const Dashboard = () => {
   const { user } = useSelector((state) => state.authResult);
@@ -102,13 +102,13 @@ const Dashboard = () => {
                 alt="person_tick_icon"
                 className="min-w-4"
               />
-              <p className="max-sm:hidden">Job & Applications</p>
+              <p className="max-sm:hidden">Job Applications</p>
             </NavLink>
           </ul>
         </div>
 
         {/* Right Side which will render associated pages on clicked*/}
-        <div>
+        <div className="flex-grow">
           <Outlet />
         </div>
       </div>
