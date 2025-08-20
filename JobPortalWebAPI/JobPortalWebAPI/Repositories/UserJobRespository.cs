@@ -125,6 +125,7 @@ namespace JobPortalWebAPI.Repositories
                             AppliedOn = a.AppliedOn,
                             JobInfo= new ReturnJobDTO
                             {
+                                Id=a.JobId,
                                 JobTitle = a.Job != null ? a.Job.JobTitle : null,
                                 JobType = a.Job != null ? a.Job.JobType : null,
                                 JobLocation = a.Job != null ? a.Job.JobLocation : null,

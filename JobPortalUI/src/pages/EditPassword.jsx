@@ -13,8 +13,7 @@ const EditPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [errors, setErrors] = useState(null);
 
-  const [updatePassword, { isLoading, isSuccess, error, data }] =
-    useUpdatePasswordMutation();
+  const [updatePassword, { isLoading }] = useUpdatePasswordMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,17 +30,29 @@ const EditPassword = () => {
     return Object.keys(error).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validatePassword()) return;
 
-    // submit data
-    updatePassword({ currentPassword, newPassword });
-    setCurrentPassword("");
-    setNewPassword("");
+    try {
+      // submit data
+      const result = await updatePassword({
+        currentPassword,
+        newPassword,
+      }).unwrap();
+      setCurrentPassword("");
+      setNewPassword("");
+      toast.success(result.message);
+      dispatch(setLogoutUser(null));
+      navigate("/");
+    } catch (error) {
+      console.log(error.data);
+      setErrors(error.data.errors);
+    }
   };
 
+  /*
   useEffect(() => {
     if (error) {
       setErrors(error.data.errors);
@@ -53,6 +64,7 @@ const EditPassword = () => {
       navigate("/");
     }
   }, [error, isSuccess, data, navigate, dispatch]);
+*/
 
   return (
     <>

@@ -2,6 +2,7 @@
 using JobPortalWebAPI.Models.Domain;
 using JobPortalWebAPI.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace JobPortalWebAPI.Repositories
 {
@@ -147,5 +148,37 @@ namespace JobPortalWebAPI.Repositories
             var activeJobsCount = await _dbContext.Jobs.Where(j => j.CompanyProfileId == companyId && j.JobStatus == "Open").CountAsync();
             return (jobsPostedCount, activeJobsCount);
         }
+
+        public async Task<List<MonthlyStatsDTO>> GetDataForGraphs(string companyId, int year)
+        {
+            // get posted jobs of the passed 'year' parameter (only include posted months not all months)
+            var jobs = await _dbContext.Jobs.Where(j => j.CompanyProfileId == companyId && j.PostedOn.Year == year).GroupBy(j => j.PostedOn.Month).Select(g => new
+            {
+                // g = each group, g.Key = number of each group (like 1,2,3...)
+                //Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.Key) // converts 1 -> "January"
+                Month = g.Key, 
+                Count = g.Count() // Count no of jobs in that month
+            }).ToListAsync();
+
+            var applications = await _dbContext.JobApplications
+               .Where(a => a.Job.CompanyProfileId == companyId && a.AppliedOn.Year == year)
+               .GroupBy(a => a.AppliedOn.Month)
+               .Select(g => new
+               {
+                   Month = g.Key,
+                   Count = g.Count()
+               })
+                 .ToListAsync();
+
+            var result = Enumerable.Range(1, 12) // creates numbers 1..12 
+              .Select(m => new MonthlyStatsDTO
+              {
+                  Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m), // gets month name like "January", "February" based on 'm' which is 1,2,..
+                  JobsCount = jobs.FirstOrDefault(x => x.Month == m)?.Count ?? 0,
+                  ApplicationsCount =  applications.FirstOrDefault(x => x.Month == m)?.Count ?? 0
+              }).ToList();
+
+            return result;
+            }
     }
 }

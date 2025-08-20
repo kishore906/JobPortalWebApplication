@@ -26,24 +26,11 @@ const EditProfile = () => {
   const fileRef = useRef(null);
 
   const { isSuccess, error, data } = useGetProfileQuery();
-  const [
-    updateUserProfile,
-    {
-      isSuccess: userSuccess,
-      isLoading: userLoading,
-      error: userErr,
-      data: userUpdateRes,
-    },
-  ] = useUpdateUserProfileMutation();
-  const [
-    updateCompanyProfile,
-    {
-      isLoading: cmpnyLoading,
-      isSuccess: cmpnySuccess,
-      error: cmpnyErr,
-      data: cmpnyRes,
-    },
-  ] = useUpdateCompanyProfileMutation();
+  const [updateUserProfile, { isLoading: userLoading }] =
+    useUpdateUserProfileMutation();
+  const [updateCompanyProfile, { isLoading: cmpnyLoading }] =
+    useUpdateCompanyProfileMutation();
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -64,7 +51,7 @@ const EditProfile = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (user?.role === "User" || user?.role === "Admin") {
@@ -102,7 +89,13 @@ const EditProfile = () => {
       //   console.log(key, value);
       // }
 
-      updateUserProfile(userFormData);
+      try {
+        const result = await updateUserProfile(userFormData).unwrap();
+        toast.success(result.message);
+        navigate("/");
+      } catch (error) {
+        console.log(error);
+      }
     } else if (user?.role === "Recruiter") {
       const companyData = new FormData();
 
@@ -121,7 +114,13 @@ const EditProfile = () => {
         );
       }
 
-      updateCompanyProfile(companyData);
+      try {
+        const result = await updateCompanyProfile(companyData).unwrap();
+        toast.success(result.message);
+        navigate("/");
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -144,15 +143,12 @@ const EditProfile = () => {
         location:
           user?.role === "User" || user?.role === "Admin"
             ? data?.location
-              ? data?.location
-              : ""
             : data.companyLocation,
         image:
-          user?.role === "User" || user?.role === "Admin"
-            ? data?.profileImagePath
-              ? `https://localhost:7091/${data?.profileImagePath}`
-              : null
-            : data?.companyImagePath
+          (user?.role === "User" || user?.role === "Admin") &&
+          data?.profileImagePath
+            ? `https://localhost:7091/${data?.profileImagePath}`
+            : user?.role === "Recruiter" && data?.companyImagePath
             ? `https://localhost:7091/${data?.companyImagePath}`
             : null,
       });
@@ -165,6 +161,7 @@ const EditProfile = () => {
     }
   }, [error, isSuccess, data, user?.role]);
 
+  /*
   // useEffect for updating user profile
   useEffect(() => {
     if (userErr) {
@@ -188,6 +185,7 @@ const EditProfile = () => {
       navigate("/");
     }
   }, [cmpnyErr, cmpnyRes, cmpnySuccess, navigate]);
+*/
 
   return (
     <>

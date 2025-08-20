@@ -9,7 +9,7 @@ const Hero = () => {
   const dispatch = useDispatch();
 
   return (
-    <div className="container mx-auto px-4 2xl:px-20 my-10">
+    <div className="container mx-auto 2xl:px-20 my-10">
       <div className="bg-gradient-to-r from-purple-800 to-purple-950 text-white py-16 text-center mx-2 rounded-xl">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium mb-4">
           Start Your Search. Shape Your Future.

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { assets } from "../../assets/assets";
 import moment from "moment";
 import Loading from "../../components/Loading";
@@ -14,42 +15,24 @@ import {
 
 const Applications = () => {
   const [showTable, setShowTable] = useState("Applied Jobs");
-  const [savedJobs, setSavedJobs] = useState(null);
-  const [appliedJobs, setAppliedJobs] = useState(null);
-  const [errMsg, setErrMsg] = useState("");
 
-  const { isLoading, isSuccess, error, data } = useGetAllSavedJobsQuery();
-  const {
-    isSuccess: fetchppliedJobsSuccess,
-    error: fetchAppliedJobsErr,
-    data: fetchAppliedJobsRes,
-  } = useGetAllAppliedJobsQuery();
+  const savedJobsQuery = useGetAllSavedJobsQuery(undefined, {
+    skip: showTable !== "Saved Jobs", // only run when tab is active
+  });
+  const appliedJobsQuery = useGetAllAppliedJobsQuery(undefined, {
+    skip: showTable !== "Applied Jobs", // only run when tab is active
+  });
+
+  // stores current get query to run
+  const currentQuery =
+    showTable === "Saved Jobs" ? savedJobsQuery : appliedJobsQuery;
+
   const [unSaveJob, { error: unsaveErr, data: unsaveRes }] =
     useUnSaveJobMutation();
   const [withdrawApplication, { error: withdrawErr, data: withdrawRes }] =
     useWithdrawApplicationMutation();
 
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-      setErrMsg(error.data.message);
-    }
-
-    if (isSuccess && data) {
-      setSavedJobs(data);
-    }
-  }, [error, isSuccess, data]);
-
-  useEffect(() => {
-    if (fetchAppliedJobsErr) {
-      console.log(fetchAppliedJobsErr);
-      setErrMsg(fetchAppliedJobsErr.data.message);
-    }
-
-    if (fetchppliedJobsSuccess && fetchAppliedJobsRes) {
-      setAppliedJobs(fetchAppliedJobsRes);
-    }
-  }, [fetchAppliedJobsErr, fetchppliedJobsSuccess, fetchAppliedJobsRes]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (unsaveErr) {
@@ -71,7 +54,7 @@ const Applications = () => {
     }
   }, [withdrawErr, withdrawRes]);
 
-  if (isLoading) return <Loading />;
+  if (currentQuery.isLoading) return <Loading />;
 
   return (
     <>
@@ -116,8 +99,12 @@ const Applications = () => {
         {showTable === "Saved Jobs" ? (
           <>
             {/* <input type="file" accept="application/pdf" onChange={(e) => e.target.files[0]} /> */}
-            {errMsg && <h2 className="text-2xl font-semibold">{errMsg}</h2>}
-            {savedJobs?.length > 0 && (
+            {currentQuery?.error?.data?.message && (
+              <h2 className="text-2xl font-semibold mt-8">
+                {currentQuery?.error?.data?.message}
+              </h2>
+            )}
+            {currentQuery?.data?.length > 0 && (
               <table className="min-w-full bg-white border rounded-lg">
                 <thead>
                   <tr className="border border-gray-200">
@@ -127,11 +114,11 @@ const Applications = () => {
                       Location
                     </th>
                     <th className="py-3 px-4 text-left">JobType</th>
-                    <th>Action</th>
+                    <th className="py-3 px-4 text-left">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {savedJobs?.map((job, index) => (
+                  {currentQuery?.data?.map((job, index) => (
                     <tr key={index} className="border border-gray-200">
                       <td className="py-3 px-4 flex items-center gap-2">
                         <img
@@ -152,6 +139,12 @@ const Applications = () => {
                       <td className="py-2 px-4">{job?.jobType}</td>
                       <td className="text-center">
                         <button
+                          className="mr-2 px-2 py-1 border-1 bg-blue-100 border-gray-400 rounded-sm outline-none"
+                          onClick={() => navigate(`/viewJob/${job.id}`)}
+                        >
+                          👁️ View
+                        </button>
+                        <button
                           className="mr-2 px-2 py-1 border-1 bg-red-500 border-gray-400 rounded-sm outline-none"
                           onClick={() => unSaveJob(job?.id)}
                         >
@@ -167,8 +160,12 @@ const Applications = () => {
         ) : (
           <>
             {/* <input type="file" accept="application/pdf" onChange={(e) => e.target.files[0]} /> */}
-            {errMsg && <h2 className="text-2xl font-semibold">{errMsg}</h2>}
-            {appliedJobs?.length > 0 && (
+            {currentQuery?.error?.data?.message && (
+              <h2 className="text-2xl font-semibold mt-8">
+                {currentQuery?.error?.data?.message}
+              </h2>
+            )}
+            {currentQuery?.data?.length > 0 && (
               <table className="min-w-full bg-white border rounded-lg">
                 <thead>
                   <tr className="border border-gray-200">
@@ -185,7 +182,7 @@ const Applications = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {appliedJobs?.map((application, index) => (
+                  {currentQuery?.data?.map((application, index) => (
                     <tr key={index} className="border border-gray-200">
                       <td className="py-3 px-4 flex items-center gap-2">
                         <img
@@ -222,6 +219,14 @@ const Applications = () => {
                         </span>
                       </td>
                       <td className="py-2 px-4">
+                        <button
+                          className="mr-2 px-2 py-1 border-1 bg-blue-100 border-gray-400 rounded-sm outline-none"
+                          onClick={() =>
+                            navigate(`/viewJob/${application?.jobInfo?.id}`)
+                          }
+                        >
+                          👁️ View
+                        </button>
                         <button
                           className="mr-2 px-2 py-1 border-1 bg-red-500 border-gray-400 rounded-sm outline-none"
                           onClick={() => withdrawApplication(application?.id)}

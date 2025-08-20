@@ -20,10 +20,8 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
 
-  const [registerCompany, { isLoading, isSuccess, error, data }] =
-    useRegisterCompanyMutation();
-  const [login, { isSuccess: success, error: err, data: resData }] =
-    useLoginMutation();
+  const [registerCompany, { isLoading }] = useRegisterCompanyMutation();
+  const [login] = useLoginMutation();
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -80,7 +78,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
   };
 
   // Step 2
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     setErrors({});
@@ -97,14 +95,29 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
       data.append("companyImage", formFields.companyImage);
       data.append("role", "Recruiter");
 
-      registerCompany(data);
+      try {
+        const result = await registerCompany(data).unwrap();
+        toast.success(result.message);
+        setShowRecruiterLogin(false);
+      } catch (error) {
+        console.log(error);
+        console.log(error.data);
+      }
     } else if (state === "Login") {
       const recruiterLogin = {
         email: formFields.email,
         password: formFields.password,
       };
 
-      login(recruiterLogin);
+      try {
+        const result = await login(recruiterLogin).unwrap();
+        toast.success(result.message);
+        setShowRecruiterLogin(false);
+        dispatch(setLoginUser(result.user));
+      } catch (error) {
+        console.log(error);
+        setErrors({ errMsg: error.data.message });
+      }
     }
   };
 
@@ -116,6 +129,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
     };
   }, []);
 
+  /*
   useEffect(() => {
     if (error) {
       console.log(error);
@@ -138,6 +152,7 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
       dispatch(setLoginUser(resData.user));
     }
   }, [err, success, resData, dispatch, setShowRecruiterLogin]);
+*/
 
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">

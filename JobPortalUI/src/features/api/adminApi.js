@@ -9,6 +9,14 @@ export const adminApi = createApi({
     getStats: builder.query({
       query: () => `/getStats`,
     }),
+    getGraphsData: builder.query({
+      query: ({ year }) => ({
+        url: "/getJobsAndApplicationsByMonth",
+        params: {
+          year,
+        },
+      }),
+    }),
     getAllUsers: builder.query({
       query: () => `/users`,
       providesTags: ["users"],
@@ -63,4 +71,5 @@ export const {
   useDeleteUserMutation,
   useDeleteCompanyUserMutation,
   useDeleteJobMutation,
+  useGetGraphsDataQuery,
 } = adminApi;

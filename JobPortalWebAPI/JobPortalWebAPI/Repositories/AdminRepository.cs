@@ -173,5 +173,31 @@ namespace JobPortalWebAPI.Repositories
 
             return (totalUserProfiles, totalCompanyProfiles, totalActiveJobs);
         }
+
+        public async Task<List<MonthlyStatsDTO>> GetJobsAndApplicationsByMonth(int year)
+        {
+            var jobs = await dbContext.Jobs
+            .Where(j => j.PostedOn.Year == year)
+            .GroupBy(j => j.PostedOn.Month)
+            .Select(g => new { Month = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+            var applications = await dbContext.JobApplications
+            .Where(a => a.AppliedOn.Year == year)   // assume you have AppliedOn date field
+            .GroupBy(a => a.AppliedOn.Month)
+            .Select(g => new { Month = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+            var result = Enumerable.Range(1, 12)
+                .Select(m => new MonthlyStatsDTO
+                {
+                    Month = System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(m),
+                    JobsCount = jobs.FirstOrDefault(x => x.Month == m)?.Count ?? 0,
+                    ApplicationsCount = applications.FirstOrDefault(x => x.Month == m)?.Count ?? 0
+                })
+                .ToList();
+
+            return result;
+        }
     }
 }

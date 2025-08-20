@@ -11,11 +11,10 @@ import { toast } from "react-toastify";
 
 const AllJobs = () => {
   const [status, setStatus] = useState("Open");
-  const [jobs, setJobs] = useState(null);
+  //const [jobs, setJobs] = useState(null);
   const [errMsg, setErrMsg] = useState("");
 
-  const { isLoading, isSuccess, error, data } =
-    useGetAllJobsByStatusQuery(status);
+  const { isLoading, error, data: jobs } = useGetAllJobsByStatusQuery(status);
   const [
     deleteJob,
     { isSuccess: jobDeleteSuccess, error: jobDeleteErr, data: jobDeleteRes },
@@ -23,14 +22,10 @@ const AllJobs = () => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
+      //console.log(error);
       setErrMsg(error.data.message);
     }
-
-    if (isSuccess && data) {
-      setJobs(data);
-    }
-  }, [error, isSuccess, data]);
+  }, [error]);
 
   useEffect(() => {
     if (jobDeleteErr) {

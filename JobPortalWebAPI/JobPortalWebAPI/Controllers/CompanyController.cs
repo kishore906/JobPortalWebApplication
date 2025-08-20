@@ -207,5 +207,19 @@ namespace JobPortalWebAPI.Controllers
 
             return Ok(new { JobsPostedCount, ActiveJobsCount });
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Recruiter")]
+        [Route("getDataForGraphs")]
+        public async Task<IActionResult> GetDataForStats([FromQuery] int year)
+        {
+            // Get current logged-in user's ApplicationUserId (string)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "Authentication required. Please login." });
+
+            var data = await jobRepository.GetDataForGraphs(userId, year);
+            return Ok(data);
+        } 
     }
 }

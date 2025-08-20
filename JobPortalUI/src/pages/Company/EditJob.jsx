@@ -25,8 +25,7 @@ const EditJob = () => {
 
   const { id } = useParams();
   const { error: jobErr, data: jobRes } = useGetJobByIdQuery(id);
-  const [updateJob, { isLoading, isSuccess, error, data }] =
-    useUpdateJobMutation();
+  const [updateJob, { isLoading }] = useUpdateJobMutation();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -34,7 +33,7 @@ const EditJob = () => {
     setJob((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const jobPostToBeUpdated = {
@@ -48,7 +47,15 @@ const EditJob = () => {
       jobLevel: job.level,
       jobSalary: job.salary,
     };
-    updateJob({ id, jobPostToBeUpdated });
+
+    try {
+      const result = await updateJob({ id, jobPostToBeUpdated }).unwrap();
+      toast.success(result.message);
+      navigate("/dashboard/manage-jobs");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.data.message);
+    }
   };
 
   useEffect(() => {
@@ -62,7 +69,6 @@ const EditJob = () => {
 
   // handling fetch job by Id
   useEffect(() => {
-    console.log("fetching job...");
     if (jobErr) {
       toast.error(jobErr.data.message);
     }
@@ -84,19 +90,6 @@ const EditJob = () => {
       }
     }
   }, [jobErr, jobRes]);
-
-  //useEffect for handling updateJob request
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-      toast.error(error.data.message);
-    }
-
-    if (isSuccess && data) {
-      toast.success(data.message);
-      navigate("/dashboard/manage-jobs");
-    }
-  }, [error, isSuccess, data, navigate, jobErr, jobRes]);
 
   return (
     <form

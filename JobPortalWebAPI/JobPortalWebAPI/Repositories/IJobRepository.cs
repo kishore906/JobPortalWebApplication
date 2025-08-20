@@ -1,4 +1,5 @@
 ﻿using JobPortalWebAPI.Models.Domain;
+using JobPortalWebAPI.Models.DTO;
 
 namespace JobPortalWebAPI.Repositories
 {
@@ -12,5 +13,6 @@ namespace JobPortalWebAPI.Repositories
         Task<(bool Success, string Message)> ChangeJobStatusAsync(string userId, Guid jobId);
         Task<bool> UpdateJobApplicationStatusAsync(Guid applicationId, string status);
         Task<(long JobsPostedCount, long ActiveJobsCount)> GetCompanyStats(string companyId);
+        Task<List<MonthlyStatsDTO>> GetDataForGraphs(string companyId, int year);
     }
 }

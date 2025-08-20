@@ -1,4 +1,3 @@
-//import JobInfo from "./JobInfo";
 import ApplicationsList from "./ApplicationsList";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -8,23 +7,16 @@ import ViewJobInDashboard from "../Company/ViewJobInDashboard";
 
 const AdminJobViewWithApplications = () => {
   const [activeBtn, setActiveBtn] = useState("jobInfo");
-  const [job, setJob] = useState(null);
-  console.log(job);
+
   const { id } = useParams();
-  const { isLoading, isSuccess, error, data } = useGetJobByIdQuery(id);
-
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-    }
-
-    if (isSuccess && data) {
-      console.log(data);
-      setJob(data);
-    }
-  }, [error, isSuccess, data]);
+  const { isLoading, error, data: job } = useGetJobByIdQuery(id);
 
   if (isLoading) return <Loading />;
+
+  if (error)
+    return (
+      <h2 className="text-center font-semibold">😔 Error in fetching job.</h2>
+    );
 
   return (
     <div className="container mx-auto p-4">

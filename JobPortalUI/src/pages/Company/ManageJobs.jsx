@@ -13,7 +13,7 @@ import filterJobs from "../../utils/filterFunction";
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
-  const [noJobsMsg, setNoJobdMsg] = useState("");
+  const [noJobsMsg, setNoJobsMsg] = useState("");
   const [filteredJobs, setFilteredJobs] = useState([]);
   const navigate = useNavigate();
 
@@ -34,6 +34,9 @@ const ManageJobs = () => {
   const handleFilter = (filters) => {
     const filteredJobs = filterJobs(jobs, filters);
     setFilteredJobs(filteredJobs);
+    if (filteredJobs.length === 0) {
+      setNoJobsMsg("No Jobs Found.");
+    }
   };
 
   const handleReset = () => {
@@ -48,7 +51,7 @@ const ManageJobs = () => {
 
     if (isSuccess && data) {
       if (data.message) {
-        setNoJobdMsg(data.message);
+        setNoJobsMsg(data.message);
       } else {
         setJobs(data);
         setFilteredJobs(data);
@@ -86,7 +89,7 @@ const ManageJobs = () => {
         {noJobsMsg && (
           <h3 className="text-center text-2xl font-bold mt-5">{noJobsMsg}</h3>
         )}
-        {filteredJobs?.length > 0 ? (
+        {filteredJobs?.length > 0 && (
           <table className="min-w-full bg-white border border-gray-200 max-sm:text-sm">
             <thead>
               <tr className="border-b border-gray-200">
@@ -155,8 +158,6 @@ const ManageJobs = () => {
               ))}
             </tbody>
           </table>
-        ) : (
-          <h2 className="text-2xl font-semibold">No Jobs Found.</h2>
         )}
 
         <div className="mt-4 flex justify-end">

@@ -17,10 +17,8 @@ const UserLogin = ({ setShowUserLogin }) => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
 
-  const [register, { isLoading, isSuccess, error, data }] =
-    useRegisterMutation();
-  const [login, { isSuccess: success, error: err, data: resData }] =
-    useLoginMutation();
+  const [register, { isLoading }] = useRegisterMutation();
+  const [login, { isLoading: loginLoading }] = useLoginMutation();
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -77,7 +75,7 @@ const UserLogin = ({ setShowUserLogin }) => {
   };
 
   // Step 2
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     setErrors({});
@@ -102,13 +100,30 @@ const UserLogin = ({ setShowUserLogin }) => {
       //   console.log(`${key}:`, value);
       // });
 
-      register(data);
+      try {
+        const result = await register(data).unwrap();
+        toast.success(result.message);
+        setShowUserLogin(false);
+      } catch (error) {
+        console.log(error);
+        console.log(error.data);
+      }
     } else if (state === "Login") {
       const userLogin = {
         email: formFields.email,
         password: formFields.password,
       };
-      login(userLogin);
+
+      try {
+        const result = await login(userLogin).unwrap();
+        toast.success(result.message);
+        setShowUserLogin(false);
+        // set user in store
+        dispatch(setLoginUser(result.user));
+      } catch (error) {
+        console.log(error);
+        setErrors({ errMsg: error.data.message });
+      }
     }
   };
 
@@ -120,6 +135,7 @@ const UserLogin = ({ setShowUserLogin }) => {
     };
   }, []);
 
+  /*
   useEffect(() => {
     if (error) {
       console.log(error.data);
@@ -143,6 +159,7 @@ const UserLogin = ({ setShowUserLogin }) => {
       dispatch(setLoginUser(resData.user));
     }
   }, [err, success, resData, setShowUserLogin, dispatch]);
+  */
 
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
@@ -285,7 +302,7 @@ const UserLogin = ({ setShowUserLogin }) => {
         <button
           type="submit"
           className="bg-blue-600 w-full text-white py-2 rounded-full mt-4"
-          disabled={isLoading}
+          disabled={isLoading || loginLoading}
         >
           {state === "Login" ? "Login" : step === 2 ? "Create Account" : "next"}
         </button>

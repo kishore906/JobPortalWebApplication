@@ -8,9 +8,10 @@ import {
 import { toast } from "react-toastify";
 
 const AllCompanies = () => {
-  const [users, setUsers] = useState(null);
+  //const [users, setUsers] = useState(null);
   const [errMsg, setErrMsg] = useState("");
-  const { isLoading, isSuccess, error, data } = useGetAllCompanyUsersQuery();
+
+  const { isLoading, error, data: users } = useGetAllCompanyUsersQuery();
   const [
     deleteCompanyUser,
     { isSuccess: deleteSuccess, error: deleteErr, data: deleteRes },
@@ -18,14 +19,10 @@ const AllCompanies = () => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
+      //console.log(error);
       setErrMsg(error?.data?.message);
     }
-
-    if (isSuccess && data) {
-      setUsers(data);
-    }
-  }, [error, isSuccess, data]);
+  }, [error]);
 
   useEffect(() => {
     if (deleteErr) {
@@ -54,8 +51,8 @@ const AllCompanies = () => {
             </tr>
           </thead>
           <tbody>
-            {users?.map((user) => (
-              <tr className="border border-gray-200">
+            {users?.map((user, index) => (
+              <tr className="border border-gray-200" key={index}>
                 <td className="py-3 px-4 flex items-center gap-2">
                   <img
                     src={

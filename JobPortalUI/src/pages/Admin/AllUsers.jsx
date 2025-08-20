@@ -8,9 +8,9 @@ import {
 import { toast } from "react-toastify";
 
 const AllUsers = () => {
-  const [users, setUsers] = useState(null);
+  //const [users, setUsers] = useState(null);
   const [errMsg, setErrMsg] = useState("");
-  const { isLoading, isSuccess, error, data } = useGetAllUsersQuery();
+  const { isLoading, error, data: users } = useGetAllUsersQuery();
   const [
     deleteUser,
     { isSuccess: deleteSuccess, error: deleteErr, data: deleteRes },
@@ -18,14 +18,10 @@ const AllUsers = () => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
+      //console.log(error);
       setErrMsg(error?.data?.message);
     }
-
-    if (isSuccess && data) {
-      setUsers(data);
-    }
-  }, [error, isSuccess, data]);
+  }, [error]);
 
   useEffect(() => {
     if (deleteErr) {
@@ -57,8 +53,8 @@ const AllUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {users?.map((user) => (
-              <tr className="border border-gray-200">
+            {users?.map((user, index) => (
+              <tr className="border border-gray-200" key={index}>
                 <td className="py-3 px-4 flex items-center gap-2">
                   <img
                     src={
@@ -77,12 +73,15 @@ const AllUsers = () => {
                   {user?.mobileNumber}
                 </td>
                 <td className="py-2 px-4">
-                  <button
-                    className="bg-red-600 px-4 py-1 text-white rounded"
-                    onClick={() => deleteUser(user?.id)}
-                  >
-                    delete
-                  </button>
+                  {user?.fullName !== "Admin" && (
+                    <button
+                      className="bg-red-600 px-4 py-1 text-white rounded"
+                      onClick={() => deleteUser(user?.id)}
+                      disabled={user?.fullName === "Admin"}
+                    >
+                      delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

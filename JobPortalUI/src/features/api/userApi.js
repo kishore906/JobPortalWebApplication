@@ -61,7 +61,7 @@ export const userApi = createApi({
           body,
         };
       },
-      invalidatesTags: ["appliedJobs"],
+      invalidatesTags: ["savedJobs", "appliedJobs"],
     }),
     getAllAppliedJobs: builder.query({
       query: () => "/getAppliedJobs",

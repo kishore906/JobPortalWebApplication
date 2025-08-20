@@ -45,17 +45,17 @@ const Navbar = ({ setShowRecruiterLogin, setShowUserLogin }) => {
             <div className="relative group">
               <img
                 src={
-                  user?.role === "User" ||
-                  (user?.role === "Admin" && user?.profileImage)
+                  (user?.role === "User" || user?.role === "Admin") &&
+                  user?.profileImage
                     ? `https://localhost:7091/${user?.profileImage}`
                     : user?.role === "Recruiter" && user?.companyImage
                     ? `https://localhost:7091/${user?.companyImage}`
-                    : user?.role === "User"
+                    : user?.role === "User" || user?.role === "Admin"
                     ? assets.upload_area
                     : assets.company_logo
                 }
                 alt="company_icon"
-                className="w-8 border-2 border-emerald-100 rounded-full"
+                className="w-8 h-8 border-2 border-emerald-100 rounded-full"
               />
               <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12 w-40">
                 <ul className="list-none m-0 p-2 bg-white rounded-md shadow text-sm">

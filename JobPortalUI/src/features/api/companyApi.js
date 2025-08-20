@@ -93,6 +93,12 @@ export const companyApi = createApi({
     getCompanyStats: builder.query({
       query: () => `/getCompanyStats`,
     }),
+    getDataForGraphs: builder.query({
+      query: ({ year }) => ({
+        url: "/getDataForGraphs",
+        params: { year },
+      }),
+    }),
   }),
 });
 
@@ -105,4 +111,5 @@ export const {
   useUpdateJobStatusMutation,
   useUpdateApplicationStatusMutation,
   useGetCompanyStatsQuery,
+  useGetDataForGraphsQuery,
 } = companyApi;

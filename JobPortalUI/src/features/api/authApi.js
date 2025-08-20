@@ -119,18 +119,19 @@ export const authApi = createApi({
         // update localstorage "user"
         const updatedUserDataInLocalStorage = {
           id: updatedCompanyUser.id,
-          fullName: updatedCompanyUser.companyName,
+          companyName: updatedCompanyUser.companyName,
           email: updatedCompanyUser.email,
           companyImage: updatedCompanyUser.companyImagePath,
           role: updatedCompanyUser.role,
         };
+
         localStorage.setItem(
           "user",
           JSON.stringify(updatedUserDataInLocalStorage)
         );
 
         // update user loggedIn in Slice
-        dispatch(setLoginUser(updatedCompanyUser));
+        dispatch(setLoginUser(updatedUserDataInLocalStorage));
       },
 
       invalidatesTags: ["user"],

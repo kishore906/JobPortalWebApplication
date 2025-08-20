@@ -133,5 +133,18 @@ namespace JobPortalWebAPI.Controllers
 
             return Ok(new { usersCount, companyCount, activeJobsCount });
         }
+
+        [HttpGet]
+        [Route("getJobsAndApplicationsByMonth")]
+        public async Task<IActionResult> GetJobsAndApplicationsByMonth([FromQuery] int year)
+        {
+            // Get logged-in user's ApplicationUserId
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "Authentication required. Please login." });
+
+            var data = await adminRepository.GetJobsAndApplicationsByMonth(year);
+            return Ok(data);
+        }
     }
 }

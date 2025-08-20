@@ -31,7 +31,7 @@ const AdminDashboard = () => {
                     : assets.upload_area
                 }
                 alt="avatar_icon"
-                className="w-8 border-2 border-emerald-100 rounded-full"
+                className="w-8 h-8 border-2 border-emerald-100 rounded-full"
               />
               <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
                 <ul className="list-none m-0 p-2 bg-white rounded-md shadow text-sm">
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
       {/* Main section (Left Sidebar and Right Associated Page)*/}
       <div className="flex items-start">
         {/* Left Sidebar with option to AddJob, ManageJob, and Viewapplications */}
-        <div className="inline-block min-h-screen border-r-2 border-gray-100">
+        <div className="inline-block min-h-screen border-r-2 border-gray-100 lg:max-w-md">
           <ul className="flex flex-col items-start pt-5 text-gray-800">
             <NavLink
               to={"/adminDashboard/statistics"}
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
               }
             >
               <img src={assets.graph} alt="graph_icon" className="w-6" />
-              <p className="max-sm:hidden">Statistics</p>
+              <p className="max-lg:hidden">Statistics</p>
             </NavLink>
 
             <NavLink
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
                 alt="add_icon"
                 className="min-w-4"
               />
-              <p className="max-sm:hidden">All Companies</p>
+              <p className="max-lg:hidden">All Companies</p>
             </NavLink>
 
             <NavLink
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
                 alt="home_icon"
                 className="min-w-4"
               />
-              <p className="max-sm:hidden">All Users</p>
+              <p className="max-lg:hidden">All Users</p>
             </NavLink>
 
             <NavLink
@@ -110,13 +110,13 @@ const AdminDashboard = () => {
                 alt="person_tick_icon"
                 className="min-w-4"
               />
-              <p className="max-sm:hidden">All Jobs</p>
+              <p className="max-lg:hidden">All Jobs</p>
             </NavLink>
           </ul>
         </div>
 
         {/* Right Side which will render associated pages on clicked*/}
-        <div className="flex-grow">
+        <div className="w-full lg:max-w-7xl">
           <Outlet />
         </div>
       </div>

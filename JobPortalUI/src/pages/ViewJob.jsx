@@ -20,51 +20,43 @@ import {
 const ViewJob = ({ setShowUserLogin, setShowRecruiterLogin }) => {
   const { id } = useParams();
   const { isAuthenticated } = useSelector((state) => state.authResult);
-  const [job, setJob] = useState(null);
+
+  // state variables
   const [saJobStatus, setSAJobStaus] = useState(null);
   const [showUploadResume, setShowUploadResume] = useState(false);
   const [resume, setResume] = useState(null);
 
   const navigate = useNavigate();
 
-  const { isLoading, isSuccess, error, data } = useGetJobByIdQuery(id);
-  const [
-    saveJob,
-    {
-      isLoading: saveJobLoading,
-      isSuccess: saveJobSuccess,
-      error: saveJobErr,
-      data: saveJobRes,
-    },
-  ] = useSaveJobMutation();
-  const [
-    applyJob,
-    {
-      isLoading: applyJobLoading,
-      isSuccess: applyJobSuccess,
-      error: applyJobErr,
-      data: applyJobRes,
-    },
-  ] = useApplyJobMutation();
+  // get query & mutations
+  const { isLoading, error, data: job } = useGetJobByIdQuery(id);
+  const [saveJob, { isLoading: saveJobLoading }] = useSaveJobMutation();
+  const [applyJob, { isLoading: applyJobLoading }] = useApplyJobMutation();
   const {
     isSuccess: saJobSuccess,
     error: saJobErr,
     data: saJobRes,
   } = useGetSavedOrAppliedJobStatusQuery(id);
-  const [unSaveJob, { error: unsaveErr, data: unsaveRes }] =
-    useUnSaveJobMutation();
+  const [unSaveJob] = useUnSaveJobMutation();
 
-  const handleSaveJob = () => {
+  const handleSaveJob = async () => {
     if (!isAuthenticated) {
       toast.info("Please Login.");
       navigate("/");
     } else {
-      if (saJobStatus?.savedJob) {
-        console.log("inside unsave");
-        //unsave
-        unSaveJob(id);
-      } else {
-        saveJob({ jobId: id });
+      try {
+        if (saJobStatus?.savedJob) {
+          console.log("inside unsave");
+          //unsave job
+          const result = await unSaveJob(id).unwrap();
+          toast.success(result.message);
+        } else {
+          // save job
+          const result = await saveJob({ jobId: id }).unwrap();
+          toast.success(result.message);
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
   };
@@ -78,50 +70,22 @@ const ViewJob = ({ setShowUserLogin, setShowRecruiterLogin }) => {
     }
   };
 
-  const handleFinalSubmit = (e) => {
+  const handleFinalSubmit = async (e) => {
     e.preventDefault();
 
     const data = new FormData();
     data.append("jobId", id);
     data.append("jobResume", resume);
 
-    applyJob(data);
-  };
-
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-    }
-
-    if (isSuccess && data) {
-      //console.log(data);
-      setJob(data);
-    }
-  }, [error, isSuccess, data]);
-
-  useEffect(() => {
-    if (saveJobErr) {
-      console.log(saveJobErr);
-    }
-
-    if (saveJobSuccess && saveJobRes) {
-      console.log(saveJobRes);
-      toast.success(saveJobRes.message);
-    }
-  }, [saveJobErr, saveJobSuccess, saveJobRes]);
-
-  useEffect(() => {
-    if (applyJobErr) {
-      console.log(applyJobErr);
-    }
-
-    if (applyJobSuccess && applyJobRes) {
-      //console.log(applyJobRes);
-      toast.success(applyJobRes.message);
+    try {
+      const result = await applyJob(data).unwrap();
+      toast.success(result.message);
       setShowUploadResume(false);
       navigate("/");
+    } catch (error) {
+      console.log(error);
     }
-  }, [applyJobErr, applyJobSuccess, applyJobRes, navigate]);
+  };
 
   useEffect(() => {
     if (saJobErr) {
@@ -129,22 +93,16 @@ const ViewJob = ({ setShowUserLogin, setShowRecruiterLogin }) => {
     }
 
     if (saJobSuccess && saJobRes) {
-      console.log(saJobRes);
       setSAJobStaus(saJobRes);
     }
   }, [saJobErr, saJobSuccess, saJobRes]);
 
-  useEffect(() => {
-    if (unsaveErr) {
-      console.log(unsaveErr);
-    }
-
-    if (unsaveRes) {
-      toast.success(unsaveRes.message);
-    }
-  }, [unsaveErr, unsaveRes]);
-
   if (isLoading) return <Loading />;
+
+  if (error)
+    return (
+      <h2 className="text-center font-semibold">😔 Error in fetching job.</h2>
+    );
 
   return (
     <>

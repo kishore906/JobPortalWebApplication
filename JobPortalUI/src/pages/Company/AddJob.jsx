@@ -19,7 +19,7 @@ const AddJob = () => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
-  const [postJob, { isLoading, isSuccess, error, data }] = usePostJobMutation();
+  const [postJob, { isLoading }] = usePostJobMutation();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -27,7 +27,7 @@ const AddJob = () => {
     setJob((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const jobPost = {
@@ -41,7 +41,15 @@ const AddJob = () => {
       jobLevel: job.level,
       jobSalary: job.salary,
     };
-    postJob(jobPost);
+
+    try {
+      const result = await postJob(jobPost).unwrap();
+      toast.success(result.message);
+      navigate("/dashboard/manage-jobs");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.data.message);
+    }
   };
 
   useEffect(() => {
@@ -53,23 +61,10 @@ const AddJob = () => {
     }
   }, []);
 
-  // useEffect for handling postJob request
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-      toast.error(error.data.message);
-    }
-
-    if (isSuccess && data) {
-      toast.success(data.message);
-      navigate("/dashboard/manage-jobs");
-    }
-  }, [error, isSuccess, data, navigate]);
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="container p-4 flex flex-col w-full items-start gap-3"
+      className="container p-4 flex flex-col w-3xl items-start gap-3"
     >
       <div className="w-full">
         <p className="mb-2 font-bold">Job Title</p>

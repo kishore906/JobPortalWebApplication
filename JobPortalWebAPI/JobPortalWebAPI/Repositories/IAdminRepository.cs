@@ -12,5 +12,6 @@ namespace JobPortalWebAPI.Repositories
         Task<bool> DeleteCompanyUserAsync(string companyUserId);
         Task<bool> DeleteJobAsync(Guid jobId);
         Task<(long usersCount, long companyCount, long activeJobsCount)> GetStats();
+        Task<List<MonthlyStatsDTO>> GetJobsAndApplicationsByMonth(int year);
     }
 }

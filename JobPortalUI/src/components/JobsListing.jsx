@@ -11,13 +11,12 @@ import { useSelector, useDispatch } from "react-redux";
 import Loading from "./Loading";
 import { useJobSearchQuery } from "../features/api/userApi";
 import { setSearchQueryAndJobLocation } from "../features/slice/jobSearchSlice";
-import { toast } from "react-toastify";
+//import { toast } from "react-toastify";
 
 const JobsListing = () => {
   const { searchQuery, jobLocation } = useSelector((state) => state.jobSearch);
 
   // job search state variables
-  const [searchResults, setSearchResults] = useState(null);
   const [jobCategory, setJobCategory] = useState("");
   const [jobLevel, setJobLevel] = useState("");
   const [jobType, setJobType] = useState("");
@@ -26,11 +25,14 @@ const JobsListing = () => {
   // filter section states
   const [showFilter, setShowFilter] = useState(false);
   const [section, setSection] = useState("category");
-  //const [open, setOpen] = useState(true);
 
   const dispatch = useDispatch();
 
-  const { isLoading, isSuccess, error, data } = useJobSearchQuery({
+  const {
+    isLoading,
+    error,
+    data: searchResults,
+  } = useJobSearchQuery({
     searchQuery,
     jobLocation,
     jobCategory,
@@ -39,6 +41,7 @@ const JobsListing = () => {
     pageNumber: currentPage,
   });
 
+  /*
   useEffect(() => {
     if (error) {
       console.log(error);
@@ -50,13 +53,12 @@ const JobsListing = () => {
       setSearchResults(data);
     }
   }, [error, isSuccess, data]);
-
-  if (isLoading) return <Loading />;
+  */
 
   return (
     <div className="container mx-auto 2xl:px-20 flex flex-col lg:flex-row max-lg:space-y-8 py-8">
       {/* Sidebar */}
-      <div className="w-full lg:w-1/4 bg-white px-6">
+      <div className="w-full lg:w-1/5 bg-white px-3">
         <button
           className="px-6 py-1.5 rounded border border-gray-400 lg:hidden"
           onClick={() => setShowFilter((prev) => !prev)}
@@ -226,26 +228,34 @@ const JobsListing = () => {
       </div>
 
       {/* Jobs Display */}
-      <section className="w-full lg:w-3/4 text-gray-800 max-lg:px-6">
+      <section className="w-full lg:w-4/5 text-gray-800 max-lg:px-6">
         <h3 className="font-medium text-3xl py-2" id="job-list">
           Latest Jobs
         </h3>
         <p className="mb-8">Apply now to get hired by the top companies</p>
 
         {/* Job Card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {searchResults?.latestJobs ? (
-            searchResults?.latestJobs?.map((job, index) => (
-              <JobCard key={index} job={job} />
-            ))
-          ) : searchResults?.jobs === 0 ? (
-            <h2 className="text-2xl font-semibold">{searchResults?.message}</h2>
-          ) : (
-            searchResults?.jobs?.map((job, index) => (
-              <JobCard key={index} job={job} />
-            ))
-          )}
-        </div>
+        {isLoading ? (
+          <Loading />
+        ) : searchResults ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {searchResults?.latestJobs ? (
+              searchResults?.latestJobs?.map((job, index) => (
+                <JobCard key={index} job={job} />
+              ))
+            ) : searchResults?.jobs === 0 ? (
+              <h2 className="text-2xl font-semibold">
+                {searchResults?.message}
+              </h2>
+            ) : (
+              searchResults?.jobs?.map((job, index) => (
+                <JobCard key={index} job={job} />
+              ))
+            )}
+          </div>
+        ) : (
+          <h3 className="text-xl font-semibold">{error?.data?.message}</h3>
+        )}
 
         {/* Pagination */}
         {(searchResults?.latestJobs?.length > 0 ||

@@ -43,6 +43,22 @@
   },
   {
     "ContainingType": "JobPortalWebAPI.Controllers.AdminController",
+    "Method": "GetJobsAndApplicationsByMonth",
+    "RelativePath": "api/Admin/getJobsAndApplicationsByMonth",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JobPortalWebAPI.Controllers.AdminController",
     "Method": "GetStats",
     "RelativePath": "api/Admin/getStats",
     "HttpMethod": "GET",
@@ -380,6 +396,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JobPortalWebAPI.Controllers.CompanyController",
+    "Method": "GetDataForStats",
+    "RelativePath": "api/Company/getDataForGraphs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {

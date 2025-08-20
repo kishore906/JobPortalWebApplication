@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { assets } from "../../assets/assets";
 import { useLogout } from "../../customHooks/useLogout";
+import { Graph1 } from "./companygraphs/Graph1";
 
 const Dashboard = () => {
   const { user } = useSelector((state) => state.authResult);
@@ -31,7 +32,7 @@ const Dashboard = () => {
                     : assets.company_logo
                 }
                 alt="company_icon"
-                className="w-8 border-2 border-emerald-100 rounded-full"
+                className="w-8 h-8 border-2 border-emerald-100 rounded-full"
               />
               <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
                 <ul className="list-none m-0 p-2 bg-white rounded-md shadow text-sm">
@@ -51,7 +52,7 @@ const Dashboard = () => {
       {/* Main section (Left Sidebar and Right Associated Page)*/}
       <div className="flex items-start">
         {/* Left Sidebar with option to AddJob, ManageJob, and Viewapplications */}
-        <div className="inline-block min-h-screen border-r-2 border-gray-100">
+        <div className="inline-block min-h-screen border-r-2 border-gray-100 lg:max-w-md">
           <ul className="flex flex-col items-start pt-5 text-gray-800">
             <NavLink
               to={"/dashboard/statistics"}
@@ -62,7 +63,7 @@ const Dashboard = () => {
               }
             >
               <img src={assets.graph} alt="graph_icon" className="w-6" />
-              <p className="max-sm:hidden">Statistics</p>
+              <p className="max-lg:hidden">Statistics</p>
             </NavLink>
 
             <NavLink
@@ -74,7 +75,7 @@ const Dashboard = () => {
               }
             >
               <img src={assets.add_icon} alt="add_icon" className="min-w-4" />
-              <p className="max-sm:hidden">Add Job</p>
+              <p className="max-lg:hidden">Add Job</p>
             </NavLink>
 
             <NavLink
@@ -86,7 +87,7 @@ const Dashboard = () => {
               }
             >
               <img src={assets.home_icon} alt="home_icon" className="min-w-4" />
-              <p className="max-sm:hidden">Manage Jobs</p>
+              <p className="max-lg:hidden">Manage Jobs</p>
             </NavLink>
 
             <NavLink
@@ -102,13 +103,13 @@ const Dashboard = () => {
                 alt="person_tick_icon"
                 className="min-w-4"
               />
-              <p className="max-sm:hidden">Job Applications</p>
+              <p className="max-lg:hidden">Job Applications</p>
             </NavLink>
           </ul>
         </div>
 
         {/* Right Side which will render associated pages on clicked*/}
-        <div className="flex-grow">
+        <div className="w-full lg:max-w-7xl">
           <Outlet />
         </div>
       </div>
