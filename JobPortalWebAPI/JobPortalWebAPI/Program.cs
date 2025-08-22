@@ -42,6 +42,8 @@ builder.Services.AddScoped<ICompanyUserRepository, CompanyUserRespository>();
 builder.Services.AddScoped<IJobRepository, JobRespository>();
 builder.Services.AddScoped<IUserJobRepository, UserJobRespository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 
 // Adding ApplicationUser (IdentityUser) to DI Container
 builder.Services.AddIdentityCore<ApplicationUser>()

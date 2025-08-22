@@ -12,16 +12,24 @@ import {
   useUnSaveJobMutation,
   useWithdrawApplicationMutation,
 } from "../../features/api/userApi";
+import Pagination from "../../components/Pagination";
 
 const Applications = () => {
   const [showTable, setShowTable] = useState("Applied Jobs");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const savedJobsQuery = useGetAllSavedJobsQuery(undefined, {
-    skip: showTable !== "Saved Jobs", // only run when tab is active
-  });
-  const appliedJobsQuery = useGetAllAppliedJobsQuery(undefined, {
-    skip: showTable !== "Applied Jobs", // only run when tab is active
-  });
+  const savedJobsQuery = useGetAllSavedJobsQuery(
+    { pageNumber: currentPage },
+    {
+      skip: showTable !== "Saved Jobs", // only run when tab is active
+    }
+  );
+  const appliedJobsQuery = useGetAllAppliedJobsQuery(
+    { pageNumber: currentPage },
+    {
+      skip: showTable !== "Applied Jobs", // only run when tab is active
+    }
+  );
 
   // stores current get query to run
   const currentQuery =
@@ -60,7 +68,7 @@ const Applications = () => {
     <>
       <Navbar />
 
-      <div className="container px-4 min-h-[65vh] 2xl:px-20 mx-auto my-10">
+      <div className="container px-4 min-h-[65vh] 2xl:px-20 mx-auto my-10 flex flex-col">
         <div className="flex gap-3 mb-4">
           <div
             className={`px-4 py-2 border border-gray-300 rounded-full ${
@@ -104,7 +112,7 @@ const Applications = () => {
                 {currentQuery?.error?.data?.message}
               </h2>
             )}
-            {currentQuery?.data?.length > 0 && (
+            {currentQuery?.data?.items.length > 0 && (
               <table className="min-w-full bg-white border rounded-lg">
                 <thead>
                   <tr className="border border-gray-200">
@@ -118,7 +126,7 @@ const Applications = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentQuery?.data?.map((job, index) => (
+                  {currentQuery?.data?.items?.map((job, index) => (
                     <tr key={index} className="border border-gray-200">
                       <td className="py-3 px-4 flex items-center gap-2">
                         <img
@@ -165,7 +173,7 @@ const Applications = () => {
                 {currentQuery?.error?.data?.message}
               </h2>
             )}
-            {currentQuery?.data?.length > 0 && (
+            {currentQuery?.data?.items?.length > 0 && (
               <table className="min-w-full bg-white border rounded-lg">
                 <thead>
                   <tr className="border border-gray-200">
@@ -182,7 +190,7 @@ const Applications = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentQuery?.data?.map((application, index) => (
+                  {currentQuery?.data?.items?.map((application, index) => (
                     <tr key={index} className="border border-gray-200">
                       <td className="py-3 px-4 flex items-center gap-2">
                         <img
@@ -240,6 +248,15 @@ const Applications = () => {
               </table>
             )}
           </>
+        )}
+
+        {/* Pagination */}
+        {currentQuery?.data?.items && (
+          <Pagination
+            totalPages={currentQuery?.data?.totalPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         )}
       </div>
 

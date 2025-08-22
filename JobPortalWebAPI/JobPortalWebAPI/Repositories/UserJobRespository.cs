@@ -18,9 +18,11 @@ namespace JobPortalWebAPI.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<ReturnJobDTO>> GetAllSavedJobsAsync(string userId)
+        public async Task<PaginatedResults<ReturnJobDTO>> GetAllSavedJobsAsync(string userId, int pageNumber)
         {
-            var savedJobs = await _dbContext.SavedJobs
+            int pageSize = 10;
+
+            var query =  _dbContext.SavedJobs
                          .Where(sj => sj.UserProfileId == userId && sj.Job != null && sj.Job.CompanyProfile != null)
                          .Include(sj => sj.Job)
                              .ThenInclude(j => j.CompanyProfile)
@@ -35,10 +37,22 @@ namespace JobPortalWebAPI.Repositories
                                  CompanyName = sj.Job.CompanyProfile!.CompanyName,
                                  CompanyImagePath = sj.Job.CompanyProfile.CompanyImagePath!
                              }
-                         })
-                         .ToListAsync();
+                         });
 
-            return savedJobs;
+            // Get total count (for frontend totalPages calculation)
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var savedJobs = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PaginatedResults<ReturnJobDTO>
+            {
+                Items = savedJobs,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                PageNumber = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            };
         }
 
         public async Task<bool> SaveJobAsync(string userId, Guid jobId)
@@ -112,34 +126,47 @@ namespace JobPortalWebAPI.Repositories
             return (rows > 0, "Job application submitted successfully.");
         }
 
-        public async Task<List<ReturnAppliedJobsDTO>> GetAllAppliedJobsAsync(string userId)
+        public async Task<PaginatedResults<ReturnAppliedJobsDTO>> GetAllAppliedJobsAsync(string userId, int pageNumber)
         {
-            var appliedJobs = await _dbContext.JobApplications
+            int pageSize = 10;
+
+            var query = _dbContext.JobApplications
                     .Where(a => a.UserProfileId == userId)
                     .Include(a => a.Job)
                         .ThenInclude(j => j.CompanyProfile)
                     .Select(a => new ReturnAppliedJobsDTO
+                    {
+                        Id = a.Id,
+                        Status = a.Status,
+                        AppliedOn = a.AppliedOn,
+                        JobInfo = new ReturnJobDTO
                         {
-                             Id = a.Id,
-                            Status = a.Status,
-                            AppliedOn = a.AppliedOn,
-                            JobInfo= new ReturnJobDTO
-                            {
-                                Id=a.JobId,
-                                JobTitle = a.Job != null ? a.Job.JobTitle : null,
-                                JobType = a.Job != null ? a.Job.JobType : null,
-                                JobLocation = a.Job != null ? a.Job.JobLocation : null,
-                                Company = a.Job != null && a.Job.CompanyProfile != null
+                            Id = a.JobId,
+                            JobTitle = a.Job != null ? a.Job.JobTitle : null,
+                            JobType = a.Job != null ? a.Job.JobType : null,
+                            JobLocation = a.Job != null ? a.Job.JobLocation : null,
+                            Company = a.Job != null && a.Job.CompanyProfile != null
                                 ? new ReturnCompanyDTO
                                 {
                                     CompanyName = a.Job.CompanyProfile.CompanyName,
                                     CompanyImagePath = a.Job.CompanyProfile.CompanyImagePath!
                                 }
                                 : null
-                            }
-                        }).ToListAsync();
+                        }
+                    });
 
-            return appliedJobs;
+            var totalCount = await query.CountAsync();
+
+            var appliedJobs = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();  
+
+            return new PaginatedResults<ReturnAppliedJobsDTO>
+            {
+                Items = appliedJobs,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                PageNumber = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            };
         }
 
         public async Task<bool> CancelApplicationAsync(string userId, Guid appId)
@@ -160,7 +187,7 @@ namespace JobPortalWebAPI.Repositories
         }
 
         // Job search and filter method
-        public async Task<object> GetJobsAsync(string? searchQuery, string? jobLocation, string? jobCategory, string? jobLevel, string? jobType, int pageNumber)
+        public async Task<PaginatedResults<ReturnJobDTO>> GetJobsAsync(string? searchQuery, string? jobLocation, string? jobCategory, string? jobLevel, string? jobType, int pageNumber)
         {
             const int pageSize = 9; // number of jobs per page
 
@@ -168,8 +195,8 @@ namespace JobPortalWebAPI.Repositories
             var query = _dbContext.Jobs.Where(j => j.JobStatus == "Open").Include(j => j.CompanyProfile).AsQueryable();
 
             // Total count before pagination
-            var totalJobs = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalJobs / (double)pageSize);
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
             // Initial load (no search, no filters)
             if (string.IsNullOrWhiteSpace(searchQuery) &&
@@ -203,11 +230,13 @@ namespace JobPortalWebAPI.Repositories
                             })
                             .ToListAsync();
 
-                    return new
+                    return new PaginatedResults<ReturnJobDTO>
                             {
-                                totalJobs,
-                                totalPages,
-                                latestJobs
+                                 Items = latestJobs,
+                                TotalCount = totalCount,
+                                PageSize = pageSize,
+                                PageNumber = pageNumber,
+                                TotalPages = totalPages
                             };
                     }
 
@@ -247,10 +276,9 @@ namespace JobPortalWebAPI.Repositories
             // Check if no jobs found
             if (totalJobsAfterFiltering == 0)
             {
-                return new
+                return new PaginatedResults<ReturnJobDTO>
                 {
-                    jobs = 0,
-                    message = "No jobs found."
+                    Items = []
                 };
             }
 
@@ -281,11 +309,13 @@ namespace JobPortalWebAPI.Repositories
                                             .ToListAsync();
 
                 // return results
-                return new
+                return new PaginatedResults<ReturnJobDTO>
                 {
-                    totalJobs = totalJobsAfterFiltering,
-                    totalPages = totalPagesAfterFiltering,
-                    jobs
+                    TotalCount = totalJobsAfterFiltering,
+                    TotalPages = totalPagesAfterFiltering,
+                    Items = jobs,
+                    PageSize = pageSize,
+                    PageNumber = pageNumber,
                 };
         }
 

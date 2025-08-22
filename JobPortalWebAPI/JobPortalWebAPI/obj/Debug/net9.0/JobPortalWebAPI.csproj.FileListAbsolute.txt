@@ -171,3 +171,4 @@ D:\.NET\.NET Core Web API and React\JobPortalWebApplication\JobPortalWebAPI\JobP
 D:\.NET\.NET Core Web API and React\JobPortalWebApplication\JobPortalWebAPI\JobPortalWebAPI\obj\Debug\net9.0\JobPortalWebAPI.genruntimeconfig.cache
 D:\.NET\.NET Core Web API and React\JobPortalWebApplication\JobPortalWebAPI\JobPortalWebAPI\obj\Debug\net9.0\ref\JobPortalWebAPI.dll
 D:\.NET\.NET Core Web API and React\JobPortalWebApplication\JobPortalWebAPI\JobPortalWebAPI\obj\Debug\net9.0\JobPortalWebAPI.sourcelink.json
+D:\.NET\.NET Core Web API and React\JobPortalWebApplication\JobPortalWebAPI\JobPortalWebAPI\bin\Debug\net9.0\BCrypt.Net-Next.dll

@@ -25,6 +25,8 @@ import ViewJobAndApplications from "./pages/Company/ViewJobAndApplications";
 import EditJob from "./pages/Company/EditJob";
 import JobInfoAndUserApplications from "./pages/Company/JobInfoAndUserApplications";
 import AdminJobViewWithApplications from "./pages/Admin/AdminJobViewWithApplications";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
@@ -66,6 +68,8 @@ function App() {
             </AuthRoute>
           }
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<AuthRoute role="Recruiter" />}>
           <Route path="/dashboard" element={<Dashboard />}>
             <Route index element={<CompanyStatistics />} />

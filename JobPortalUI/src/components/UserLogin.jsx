@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
 import { useRegisterMutation, useLoginMutation } from "../features/api/authApi";
 import { setLoginUser } from "../features/slice/userSlice";
+import { Link } from "react-router-dom";
 
 const UserLogin = ({ setShowUserLogin }) => {
   const [state, setState] = useState("Login");
@@ -294,9 +295,12 @@ const UserLogin = ({ setShowUserLogin }) => {
         )}
 
         {state === "Login" && (
-          <p className="text-sm text-blue-600 underline mt-4 cursor-pointer">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-600 underline mt-4 cursor-pointer"
+          >
             Forgot Password?
-          </p>
+          </Link>
         )}
 
         <button

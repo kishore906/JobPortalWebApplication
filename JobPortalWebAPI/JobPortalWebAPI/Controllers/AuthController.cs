@@ -21,13 +21,15 @@ namespace JobPortalWebAPI.Controllers
         private readonly IUserProfileRepository userProfileRepository;
         private readonly ICompanyUserRepository companyUserRepository;
         private readonly ITokenRepository tokenRepository;
+        private readonly IPasswordResetRepository passwordResetRepository;
 
-        public AuthController(UserManager<ApplicationUser> userManager, IUserProfileRepository userProfileRepository, ITokenRepository tokenRepository, ICompanyUserRepository companyUserRepository)
+        public AuthController(UserManager<ApplicationUser> userManager, IUserProfileRepository userProfileRepository, ITokenRepository tokenRepository, ICompanyUserRepository companyUserRepository, IPasswordResetRepository passwordResetRepository)
         {
             this.userManager = userManager;
             this.userProfileRepository = userProfileRepository;
             this.tokenRepository = tokenRepository;
             this.companyUserRepository = companyUserRepository;
+            this.passwordResetRepository = passwordResetRepository;
         }
 
         // POST: /api/Auth/Register
@@ -414,6 +416,43 @@ namespace JobPortalWebAPI.Controllers
             });
 
             return Ok(new { message = "Password updated successfully!!" } );
+        }
+
+        // Forgot password
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO forgotPasswordRequestDTO)
+        {
+            var (Success, Message) = await passwordResetRepository.ForgotPasswordAsync(forgotPasswordRequestDTO.Email);
+
+            if (!Success) return BadRequest(new { Message });
+
+            return Ok(new { Message });
+        }
+
+        // Reset password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO resetPasswordRequestDTO)
+        {
+            // Calling respository method
+            var result = await passwordResetRepository.ResetPasswordAsync(resetPasswordRequestDTO.Email, resetPasswordRequestDTO.Token, resetPasswordRequestDTO.NewPassword);
+
+            if(!result.Succeeded)
+            {
+                // Return 400 Bad Request with errors
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Password reset failed.",
+                    errors = result.Errors
+                });
+            }
+
+            // Return 200 OK with success message
+            return Ok(new
+            {
+                success = true,
+                message = result.Message
+            });
         }
 
         // PUT: /api/Auth/UpdateCompanyPswd

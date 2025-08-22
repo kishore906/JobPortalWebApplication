@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Loading from "./Loading";
 import { useJobSearchQuery } from "../features/api/userApi";
 import { setSearchQueryAndJobLocation } from "../features/slice/jobSearchSlice";
+import Pagination from "./Pagination";
 //import { toast } from "react-toastify";
 
 const JobsListing = () => {
@@ -40,20 +41,6 @@ const JobsListing = () => {
     jobType,
     pageNumber: currentPage,
   });
-
-  /*
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-      //toast.error(error.data.message);
-    }
-
-    if (isSuccess && data) {
-      console.log(data);
-      setSearchResults(data);
-    }
-  }, [error, isSuccess, data]);
-  */
 
   return (
     <div className="container mx-auto 2xl:px-20 flex flex-col lg:flex-row max-lg:space-y-8 py-8">
@@ -237,62 +224,33 @@ const JobsListing = () => {
         {/* Job Card */}
         {isLoading ? (
           <Loading />
-        ) : searchResults ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {searchResults?.latestJobs ? (
-              searchResults?.latestJobs?.map((job, index) => (
+        ) : searchResults?.items || searchResults?.message ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
+            {searchResults?.items?.length > 0 ? (
+              searchResults?.items?.map((job, index) => (
                 <JobCard key={index} job={job} />
               ))
-            ) : searchResults?.jobs === 0 ? (
-              <h2 className="text-2xl font-semibold">
-                {searchResults?.message}
-              </h2>
             ) : (
-              searchResults?.jobs?.map((job, index) => (
-                <JobCard key={index} job={job} />
-              ))
+              <h2 className="text-2xl font-semibold">
+                😔 {searchResults?.message}
+              </h2>
             )}
           </div>
         ) : (
-          <h3 className="text-xl font-semibold">{error?.data?.message}</h3>
+          error?.data === null && (
+            <h2 className="text-3xl font-semibold text-center">
+              😔 Error in Fetching jobs.
+            </h2>
+          )
         )}
 
         {/* Pagination */}
-        {(searchResults?.latestJobs?.length > 0 ||
-          searchResults?.jobs?.length > 0) && (
-          <div className="flex items-center justify-center space-x-2 mt-10">
-            <img
-              src={assets.left_arrow_icon}
-              alt="left_arrow_icon"
-              onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-            />
-
-            {Array.from({ length: searchResults?.totalPages }).map(
-              (_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentPage(index + 1)}
-                  className={`w-10 h-10 flex items-center justify-center border border-gray-300 rounded ${
-                    currentPage === index + 1
-                      ? "bg-blue-100 text-blue-500"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              )
-            )}
-
-            <img
-              src={assets.right_arrow_icon}
-              alt="right_arrow_icon"
-              onClick={() =>
-                setCurrentPage(
-                  Math.min(currentPage + 1, searchResults?.totalPages)
-                )
-              }
-            />
-          </div>
+        {searchResults?.items?.length > 0 && (
+          <Pagination
+            totalPages={searchResults?.totalPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         )}
       </section>
     </div>

@@ -50,7 +50,12 @@ export const userApi = createApi({
       invalidatesTags: ["savedJobs"],
     }),
     getAllSavedJobs: builder.query({
-      query: () => "/savedJobs",
+      query: ({ pageNumber }) => ({
+        url: "/savedJobs",
+        params: {
+          pageNumber,
+        },
+      }),
       providesTags: ["savedJobs"],
     }),
     applyJob: builder.mutation({
@@ -64,7 +69,12 @@ export const userApi = createApi({
       invalidatesTags: ["savedJobs", "appliedJobs"],
     }),
     getAllAppliedJobs: builder.query({
-      query: () => "/getAppliedJobs",
+      query: ({ pageNumber }) => ({
+        url: "/getAppliedJobs",
+        params: {
+          pageNumber,
+        },
+      }),
       providesTags: ["appliedJobs"],
     }),
     withdrawApplication: builder.mutation({

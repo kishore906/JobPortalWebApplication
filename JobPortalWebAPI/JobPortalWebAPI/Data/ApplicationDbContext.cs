@@ -16,6 +16,7 @@ namespace JobPortalWebAPI.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

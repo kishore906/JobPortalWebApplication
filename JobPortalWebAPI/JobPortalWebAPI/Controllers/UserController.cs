@@ -52,7 +52,7 @@ namespace JobPortalWebAPI.Controllers
         [HttpGet]
         [Authorize(Roles = "User")]
         [Route("savedJobs")]
-        public async Task<IActionResult> GetAllSavedJobs() {
+        public async Task<IActionResult> GetAllSavedJobs([FromQuery] int pageNumber) {
 
             // Get logged-in user's ApplicationUserId
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -60,9 +60,9 @@ namespace JobPortalWebAPI.Controllers
                 return Unauthorized(new { message = "Authentication required. Please login." });
 
             // Calling Repository method
-            var savedJobs = await userJobRepository.GetAllSavedJobsAsync(userId);
+            var savedJobs = await userJobRepository.GetAllSavedJobsAsync(userId, pageNumber);
 
-            if (savedJobs.Count == 0) return NotFound(new { message = "No jobs found." });
+            if (savedJobs.Items.Count == 0) return NotFound(new { message = "No Jobs Saved" });
 
             return Ok(savedJobs);
         }
@@ -108,16 +108,16 @@ namespace JobPortalWebAPI.Controllers
         [HttpGet]
         [Authorize(Roles = "User")]
         [Route("getAppliedJobs")]
-        public async Task<IActionResult> GetAllAppliedJobs()
+        public async Task<IActionResult> GetAllAppliedJobs([FromQuery] int pageNumber)
         {
             // Get loggedIn User
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var appliedJobs = await userJobRepository.GetAllAppliedJobsAsync(userId);
+            var appliedJobs = await userJobRepository.GetAllAppliedJobsAsync(userId, pageNumber);
 
-            if (appliedJobs.Count == 0) return NotFound(new { message = "No Jobs Applied" });
+            if (appliedJobs.Items.Count == 0) return NotFound(new { message = "No Jobs Applied" });
 
             return Ok(appliedJobs);
         }
@@ -166,6 +166,8 @@ namespace JobPortalWebAPI.Controllers
                                     [FromQuery] int pageNumber = 1) {
             // call the repository method that does the search & filtering & pagination
             var result = await userJobRepository.GetJobsAsync(searchQuery, jobLocation, jobCategory, jobLevel, jobType, pageNumber);
+
+            if (result.Items.Count == 0) return Ok(new {message = "No Jobs Found."});
 
             return Ok(result);
         }
