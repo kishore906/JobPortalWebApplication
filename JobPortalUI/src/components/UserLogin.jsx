@@ -298,6 +298,7 @@ const UserLogin = ({ setShowUserLogin }) => {
           <Link
             to="/forgot-password"
             className="text-sm text-blue-600 underline mt-4 cursor-pointer"
+            onClick={() => setShowUserLogin(false)}
           >
             Forgot Password?
           </Link>

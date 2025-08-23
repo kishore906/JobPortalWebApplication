@@ -7,6 +7,7 @@ import {
   useLoginMutation,
 } from "../features/api/authApi";
 import { setLoginUser } from "../features/slice/userSlice";
+import { Link } from "react-router-dom";
 
 const RecruiterLogin = ({ setShowRecruiterLogin }) => {
   const [state, setState] = useState("Login");
@@ -287,9 +288,13 @@ const RecruiterLogin = ({ setShowRecruiterLogin }) => {
         )}
 
         {state === "Login" && (
-          <p className="text-sm text-blue-600 underline mt-4 cursor-pointer">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-600 underline mt-4 cursor-pointer"
+            onClick={() => setShowRecruiterLogin(false)}
+          >
             Forgot Password?
-          </p>
+          </Link>
         )}
 
         <button
