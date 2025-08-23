@@ -8,13 +8,17 @@ import {
 } from "../../features/api/adminApi";
 import Loading from "../../components/Loading";
 import { toast } from "react-toastify";
+import Pagination from "../../components/Pagination";
 
 const AllJobs = () => {
   const [status, setStatus] = useState("Open");
-  //const [jobs, setJobs] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [errMsg, setErrMsg] = useState("");
 
-  const { isLoading, error, data: jobs } = useGetAllJobsByStatusQuery(status);
+  const { isLoading, error, data } = useGetAllJobsByStatusQuery({
+    status,
+    pageNumber: currentPage,
+  });
   const [
     deleteJob,
     { isSuccess: jobDeleteSuccess, error: jobDeleteErr, data: jobDeleteRes },
@@ -40,7 +44,7 @@ const AllJobs = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container p-4">
+    <div className="container p-4 min-h-[95vh] flex flex-col">
       <div className="flex gap-4">
         <button
           className={`w-28 py-2 mt-4 border-1 rounded-full ${
@@ -62,11 +66,10 @@ const AllJobs = () => {
 
       <div className="overflow-x-auto mt-4">
         {errMsg && <h2 className="text-2xl font-semibold">{errMsg}</h2>}
-        {jobs?.length > 0 && (
-          <table className="w-full max-w-8xl bg-white border border-gray-200 max-sm:text-sm">
+        {data?.items?.length > 0 && (
+          <table className="w-full max-w-8xl bg-white border border-gray-200 max-sm:text-sm mb-5">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="py-2 px-4 text-left">#</th>
                 <th className="py-2 px-4 text-left">JobTitle</th>
                 <th className="py-2 px-4 text-left">Company</th>
                 <th className="py-2 px-4 text-left max-sm:hidden">Location</th>
@@ -79,9 +82,8 @@ const AllJobs = () => {
               </tr>
             </thead>
             <tbody>
-              {jobs?.map((job, index) => (
+              {data?.items?.map((job, index) => (
                 <tr key={index} className="border-b border-gray-200">
-                  <td className="py-3 px-4 text-center">{index + 1}</td>
                   <td className="py-3 px-4">{job.jobTitle}</td>
                   <td className="py-3 px-4 flex items-center gap-2">
                     <img
@@ -135,6 +137,15 @@ const AllJobs = () => {
           </table>
         )}
       </div>
+
+      {/* Pagination */}
+      {data?.items?.length > 0 && (
+        <Pagination
+          totalPages={data?.totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

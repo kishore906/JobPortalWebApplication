@@ -49,7 +49,7 @@ export function Graph1({ graphData }) {
     datasets: [
       {
         label: "Jobs Posted",
-        data: graphData.map((d) => d.jobsCount),
+        data: graphData?.map((d) => d.jobsCount),
         backgroundColor: "rgb(156,163,175)",
       },
     ],

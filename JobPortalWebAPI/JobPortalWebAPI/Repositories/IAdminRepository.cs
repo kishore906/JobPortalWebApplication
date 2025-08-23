@@ -4,9 +4,9 @@ namespace JobPortalWebAPI.Repositories
 {
     public interface IAdminRepository
     {
-        Task<List<UserSummaryDTO>> GetAllUsersAsync();
-        Task<List<ReturnCompanyDTO>> GetAllCompanyUsersAsync();
-        Task<List<ReturnJobDTO>> GetAllJobsAsync(string status);
+        Task<PaginatedResults<UserSummaryDTO>> GetAllUsersAsync(int pageNumber);
+        Task<PaginatedResults<ReturnCompanyDTO>> GetAllCompanyUsersAsync(int pageNumber);
+        Task<PaginatedResults<ReturnJobDTO>> GetAllJobsAsync(string status, int pageNumber);
         Task<object?> GetJobByIdAsync(Guid jobId);
         Task<bool> DeleteUserAsync(string userId);
         Task<bool> DeleteCompanyUserAsync(string companyUserId);

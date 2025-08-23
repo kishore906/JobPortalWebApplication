@@ -118,7 +118,7 @@ namespace JobPortalWebAPI.Controllers
         [HttpGet]
         [Authorize(Roles = "Recruiter")]
         [Route("getAllJobs")]
-        public async Task<IActionResult> GetAllJobsOfTheCompany()
+        public async Task<IActionResult> GetAllJobsOfTheCompany([FromQuery] int pageNumber)
         {
             // Get current logged-in user's ApplicationUserId (string)
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -127,11 +127,11 @@ namespace JobPortalWebAPI.Controllers
                 return Unauthorized(new { message = "Authentication required. Please login." });
 
             // get all the jobs by calling repository method
-            var jobs = await jobRepository.GetAllJobsOfTheCompanyAsync(userId);
+            var result = await jobRepository.GetAllJobsOfTheCompanyAsync(userId, pageNumber);
 
-            if (jobs.Count == 0) return Ok(new { message = "No jobs are found." } );
+            if (result.Items.Count == 0) return Ok(new { message = "No jobs are found." } );
 
-            return Ok(jobs);
+            return Ok(result);
         }
 
         // Get Single Job & display all the Users applied for the Job

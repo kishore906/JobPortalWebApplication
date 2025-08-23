@@ -18,18 +18,33 @@ export const adminApi = createApi({
       }),
     }),
     getAllUsers: builder.query({
-      query: () => `/users`,
+      query: ({ pageNumber }) => ({
+        url: `/users`,
+        params: {
+          pageNumber,
+        },
+      }),
       providesTags: ["users"],
     }),
     getAllCompanyUsers: builder.query({
-      query: () => `/companyUsers`,
+      query: ({ pageNumber }) => ({
+        url: `/companyUsers`,
+        params: {
+          pageNumber,
+        },
+      }),
       providesTags: ["companies"],
     }),
     getJobById: builder.query({
       query: (id) => `/allJobs/${id}`,
     }),
     getAllJobsByStatus: builder.query({
-      query: (status) => `/jobs/${status}`,
+      query: ({ status, pageNumber }) => ({
+        url: `/jobs/${status}`,
+        params: {
+          pageNumber,
+        },
+      }),
       providesTags: ["jobs"],
     }),
     deleteUser: builder.mutation({

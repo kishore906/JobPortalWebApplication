@@ -7,7 +7,12 @@ export const companyApi = createApi({
   tagTypes: ["Job"],
   endpoints: (builder) => ({
     getAllJobs: builder.query({
-      query: () => "/getAllJobs",
+      query: ({ pageNumber }) => ({
+        url: "/getAllJobs",
+        params: {
+          pageNumber,
+        },
+      }),
       providesTags: (result) =>
         result.length > 0
           ? [

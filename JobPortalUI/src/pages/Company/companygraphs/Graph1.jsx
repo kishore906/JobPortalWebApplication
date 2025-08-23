@@ -54,7 +54,7 @@ export function Graph1({ graphData }) {
       },
       {
         label: "Application received",
-        data: graphData.map((d) => d.applicationsCount),
+        data: graphData?.map((d) => d.applicationsCount),
         backgroundColor: "rgb(45,44,50)",
       },
     ],

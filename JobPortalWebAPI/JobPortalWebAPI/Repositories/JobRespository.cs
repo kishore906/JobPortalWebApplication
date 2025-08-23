@@ -1,6 +1,7 @@
 ﻿using JobPortalWebAPI.Data;
 using JobPortalWebAPI.Models.Domain;
 using JobPortalWebAPI.Models.DTO;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -15,9 +16,22 @@ namespace JobPortalWebAPI.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<Job>> GetAllJobsOfTheCompanyAsync(string companyId)
+        public async Task<PaginatedResults<Job>> GetAllJobsOfTheCompanyAsync(string companyId, int pageNumber)
         {
-            return await _dbContext.Jobs.Where(j => j.CompanyProfileId == companyId).ToListAsync();
+            int pageSize = 10;
+            var query = _dbContext.Jobs.Where(j => j.CompanyProfileId == companyId);
+            var totalCount = await query.CountAsync();
+
+            var jobs = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PaginatedResults<Job>
+            {
+                Items = jobs,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount/ (double)pageSize),
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task<object?> GetJobAsync(Guid jobId)

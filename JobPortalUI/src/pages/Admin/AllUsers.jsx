@@ -6,11 +6,14 @@ import {
   useDeleteUserMutation,
 } from "../../features/api/adminApi";
 import { toast } from "react-toastify";
+import Pagination from "../../components/Pagination";
 
 const AllUsers = () => {
-  //const [users, setUsers] = useState(null);
   const [errMsg, setErrMsg] = useState("");
-  const { isLoading, error, data: users } = useGetAllUsersQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { isLoading, error, data } = useGetAllUsersQuery({
+    pageNumber: currentPage,
+  });
   const [
     deleteUser,
     { isSuccess: deleteSuccess, error: deleteErr, data: deleteRes },
@@ -36,7 +39,7 @@ const AllUsers = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container max-w-5xl mt-5 ml-3">
+    <div className="container min-h-[95vh] max-w-7xl mt-5 ml-3 flex flex-col">
       {errMsg ? (
         <h2 className="text-2xl font-semibold">{errMsg}</h2>
       ) : (
@@ -53,7 +56,7 @@ const AllUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {users?.map((user, index) => (
+            {data?.items?.map((user, index) => (
               <tr className="border border-gray-200" key={index}>
                 <td className="py-3 px-4 flex items-center gap-2">
                   <img
@@ -87,6 +90,15 @@ const AllUsers = () => {
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Pagination */}
+      {data?.items?.length > 0 && (
+        <Pagination
+          totalPages={data?.totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       )}
     </div>
   );

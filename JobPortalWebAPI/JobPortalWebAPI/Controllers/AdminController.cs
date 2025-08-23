@@ -19,49 +19,49 @@ namespace JobPortalWebAPI.Controllers
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber)
         {
             // Get logged-in user's ApplicationUserId
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { message = "Authentication required. Please login." });
 
-            var users = await adminRepository.GetAllUsersAsync();
+            var result = await adminRepository.GetAllUsersAsync(pageNumber);
 
-            if (users.Count == 0) return NotFound(new { message = "No Users Found."});
+            if (result.Items.Count == 0) return NotFound(new { message = "No Users Found."});
 
-            return Ok(users);
+            return Ok(result);
         }
 
         [HttpGet("companyUsers")]
-        public async Task<IActionResult> GetAllCompanyUsers()
+        public async Task<IActionResult> GetAllCompanyUsers([FromQuery] int pageNumber)
         {
             // Get logged-in user's ApplicationUserId
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { message = "Authentication required. Please login." });
 
-            var companyUsers = await adminRepository.GetAllCompanyUsersAsync();
+            var result = await adminRepository.GetAllCompanyUsersAsync(pageNumber);
 
-            if (companyUsers.Count == 0) return NotFound(new { message = "No CompanyUsers Found." });
+            if (result.Items.Count == 0) return NotFound(new { message = "No CompanyUsers Found." });
 
-            return Ok(companyUsers);
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("jobs/{status}")]
-        public async Task<IActionResult> GetAllJobsByStatus([FromRoute] string status)
+        public async Task<IActionResult> GetAllJobsByStatus([FromRoute] string status, [FromQuery] int pageNumber)
         {
             // Get logged-in user's ApplicationUserId
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { message = "Authentication required. Please login." });
 
-            var jobs = await adminRepository.GetAllJobsAsync(status);
+            var result = await adminRepository.GetAllJobsAsync(status, pageNumber);
 
-            if (jobs.Count == 0) return NotFound(new { message = "No Jobs Found." });
+            if (result.Items.Count == 0) return NotFound(new { message = "No Jobs Found." });
 
-            return Ok(jobs);
+            return Ok(result);
         }
 
         [HttpGet]

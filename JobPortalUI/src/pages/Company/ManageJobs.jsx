@@ -10,14 +10,18 @@ import Loading from "../../components/Loading";
 import SearchReusable from "./SearchReusable";
 import { toast } from "react-toastify";
 import filterJobs from "../../utils/filterFunction";
+import Pagination from "../../components/Pagination";
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [noJobsMsg, setNoJobsMsg] = useState("");
   const [filteredJobs, setFilteredJobs] = useState([]);
   const navigate = useNavigate();
 
-  const { isLoading, isSuccess, error, data } = useGetAllJobsQuery();
+  const { isLoading, isSuccess, error, data } = useGetAllJobsQuery({
+    pageNumber: currentPage,
+  });
   const [
     deleteJob,
     { isSuccess: deleteSuccess, error: deleteErr, data: deleteRes },
@@ -30,6 +34,8 @@ const ManageJobs = () => {
       data: statusUpdateres,
     },
   ] = useUpdateJobStatusMutation();
+
+  const totalPages = Math.ceil(filteredJobs?.length / 10);
 
   const handleFilter = (filters) => {
     const filteredJobs = filterJobs(jobs, filters);
@@ -53,8 +59,8 @@ const ManageJobs = () => {
       if (data.message) {
         setNoJobsMsg(data.message);
       } else {
-        setJobs(data);
-        setFilteredJobs(data);
+        setJobs(data.items);
+        setFilteredJobs(data.items);
       }
     }
   }, [error, isSuccess, data]);
@@ -82,9 +88,8 @@ const ManageJobs = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container p-4 max-w-7xl">
+    <div className="container p-4 min-h-[90vh] max-w-7xl flex flex-col">
       <SearchReusable onFilter={handleFilter} onReset={handleReset} />
-
       <div className="overflow-x-auto">
         {noJobsMsg && (
           <h3 className="text-center text-2xl font-bold mt-5">{noJobsMsg}</h3>
@@ -93,7 +98,6 @@ const ManageJobs = () => {
           <table className="min-w-full bg-white border border-gray-200 max-sm:text-sm">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="py-2 px-4 text-left max-sm:hidden">#</th>
                 <th className="py-2 px-4 text-left">Job Title</th>
                 <th className="py-2 px-4 text-left max-sm:hidden">Location</th>
                 <th className="py-2 px-4 text-left max-sm:hidden">Job Type</th>
@@ -106,7 +110,6 @@ const ManageJobs = () => {
             <tbody>
               {filteredJobs?.map((job, index) => (
                 <tr key={index} className="border-b border-gray-200">
-                  <td className="py-3 px-4 max-sm:hidden">{index + 1}</td>
                   <td className="py-3 px-4">{job.jobTitle}</td>
                   <td className="py-3 px-4">{job.jobLocation}</td>
                   <td className="py-3 px-4 max-sm:hidden">{job.jobType}</td>
@@ -169,6 +172,15 @@ const ManageJobs = () => {
           </button>
         </div>
       </div>
+
+      {/* Pagination */}
+      {filteredJobs?.length > 0 && (
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

@@ -8,7 +8,7 @@ namespace JobPortalWebAPI.Repositories
         Task<bool> PostAJob(Job job);
         Task<(bool Success, string Message)> UpdateJobAsync(Guid jobId, Job job);
         Task<(bool Success, string Message)> DeleteJobAsync(Guid JobId, string userId);
-        Task<List<Job>> GetAllJobsOfTheCompanyAsync(string companyId);
+        Task<PaginatedResults<Job>> GetAllJobsOfTheCompanyAsync(string companyId, int pageNumber);
         Task<object?> GetJobAsync(Guid jobId);
         Task<(bool Success, string Message)> ChangeJobStatusAsync(string userId, Guid jobId);
         Task<bool> UpdateJobApplicationStatusAsync(Guid applicationId, string status);

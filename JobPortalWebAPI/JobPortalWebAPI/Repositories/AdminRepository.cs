@@ -18,51 +18,89 @@ namespace JobPortalWebAPI.Repositories
         }
 
 
-        public async Task<List<UserSummaryDTO>> GetAllUsersAsync()
+        public async Task<PaginatedResults<UserSummaryDTO>> GetAllUsersAsync(int pageNumber)
         {
-            return await dbContext.UserProfiles.Include(up => up.ApplicationUser).Select(up => new UserSummaryDTO
-                {
-                    Id = up.ApplicationUserId,
-                    FullName = up.FullName,
-                    Email = up.ApplicationUser!.Email,
-                    Location = up.Location,
-                    MobileNumber = up.MobileNumber,
-                    ProfileImagePath = up.ProfileImagePath
-                }).ToListAsync();
+            int pageSize = 10;
+            var query = dbContext.UserProfiles.Include(up => up.ApplicationUser).Select(up => new UserSummaryDTO
+            {
+                Id = up.ApplicationUserId,
+                FullName = up.FullName,
+                Email = up.ApplicationUser!.Email,
+                Location = up.Location,
+                MobileNumber = up.MobileNumber,
+                ProfileImagePath = up.ProfileImagePath
+            });
+            
+            var totalCount = await query.CountAsync();
+
+            var users = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PaginatedResults<UserSummaryDTO>
+            {
+                Items = users,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
         }
 
-        public async Task<List<ReturnCompanyDTO>> GetAllCompanyUsersAsync()
+        public async Task<PaginatedResults<ReturnCompanyDTO>> GetAllCompanyUsersAsync(int pageNumber)
         {
-            return await dbContext.CompanyProfiles.Include(cp => cp.ApplicationUser).Select(cp => new ReturnCompanyDTO
+            int pageSize = 10;
+            var query = dbContext.CompanyProfiles.Include(cp => cp.ApplicationUser).Select(cp => new ReturnCompanyDTO
             {
                 Id = cp.ApplicationUserId,
                 CompanyName = cp.CompanyName,
                 CompanyEmail = cp.ApplicationUser!.Email,
                 CompanyImagePath = cp.CompanyImagePath,
                 CompanyLocation = cp.CompanyLocation
-            }).ToListAsync();
+            });
+            var totalCount = await query.CountAsync();
+            var companies = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return new PaginatedResults<ReturnCompanyDTO>
+            {
+                Items = companies,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
         }
 
-        public async Task<List<ReturnJobDTO>> GetAllJobsAsync(string status)
+        public async Task<PaginatedResults<ReturnJobDTO>> GetAllJobsAsync(string status, int pageNumber)
         {
-            return await dbContext.Jobs.Where(j => j.JobStatus.ToLower() == status.ToLower())
+            int pageSize = 10;
+            var query = dbContext.Jobs.Where(j => j.JobStatus.ToLower() == status.ToLower())
                 .Include(j => j.CompanyProfile).Select(j => new ReturnJobDTO
-            {
-                Id = j.Id,
-                JobTitle = j.JobTitle,
-                //JobDescription = j.JobDescription,
-                JobStatus = j.JobStatus,
-                JobType = j.JobType,
-                JobLocation = j.JobLocation,
-                //JobSalary = j.JobSalary,
-                PostedOn = j.PostedOn,
-                Company = new ReturnCompanyDTO
                 {
-                    CompanyName = j.CompanyProfile!.CompanyName,
-                    //CompanyLocation = j.CompanyProfile.CompanyLocation,
-                    CompanyImagePath = j.CompanyProfile.CompanyImagePath,
-                }
-            }).ToListAsync();
+                    Id = j.Id,
+                    JobTitle = j.JobTitle,
+                    //JobDescription = j.JobDescription,
+                    JobStatus = j.JobStatus,
+                    JobType = j.JobType,
+                    JobLocation = j.JobLocation,
+                    //JobSalary = j.JobSalary,
+                    PostedOn = j.PostedOn,
+                    Company = new ReturnCompanyDTO
+                    {
+                        CompanyName = j.CompanyProfile!.CompanyName,
+                        //CompanyLocation = j.CompanyProfile.CompanyLocation,
+                        CompanyImagePath = j.CompanyProfile.CompanyImagePath,
+                    }
+                });
+
+           var totalCount = await query.CountAsync();
+            var jobs = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PaginatedResults<ReturnJobDTO>
+            {
+                Items = jobs,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task<object?> GetJobByIdAsync(Guid jobId)

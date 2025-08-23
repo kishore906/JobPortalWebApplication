@@ -5,12 +5,19 @@ import { useGetAllJobsQuery } from "../../features/api/companyApi";
 import Loading from "../../components/Loading";
 import SearchReusable from "./SearchReusable";
 import filterJobs from "../../utils/filterFunction";
+import Pagination from "../../components/Pagination";
 
 const ViewJobAndApplications = () => {
-  const { isLoading, isSuccess, error, data } = useGetAllJobsQuery();
   const [jobs, setJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [noJobsMsg, setNoJobdMsg] = useState("");
+
+  const { isLoading, isSuccess, error, data } = useGetAllJobsQuery({
+    pageNumber: currentPage,
+  });
+
+  const totalPages = Math.ceil(filteredJobs?.length / 10);
 
   const handleFilter = (filters) => {
     const filteredJobs = filterJobs(jobs, filters);
@@ -31,8 +38,8 @@ const ViewJobAndApplications = () => {
       if (data.message) {
         setNoJobdMsg(data.message);
       } else {
-        setJobs(data);
-        setFilteredJobs(data);
+        setJobs(data.items);
+        setFilteredJobs(data.items);
       }
     }
   }, [error, isSuccess, data]);
@@ -40,7 +47,7 @@ const ViewJobAndApplications = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 min-h-[90vh] flex flex-col">
       <SearchReusable onFilter={handleFilter} onReset={handleReset} />
 
       <div className="overflow-x-auto">
@@ -103,6 +110,15 @@ const ViewJobAndApplications = () => {
           <h2 className="text-2xl font-semibold">No Jobs Found.</h2>
         )}
       </div>
+
+      {/* Pagination */}
+      {filteredJobs?.length > 0 && (
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </div>
   );
 };
