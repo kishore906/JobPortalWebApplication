@@ -39,7 +39,7 @@ const AllCompanies = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container max-w-6xl min-h-[95vh] mt-5 ml-3 flex flex-col">
+    <div className="container max-w-6xl min-h-[90vh] mt-5 ml-3 flex flex-col">
       {errMsg ? (
         <h2 className="text-2xl font-semibold">{errMsg}</h2>
       ) : (

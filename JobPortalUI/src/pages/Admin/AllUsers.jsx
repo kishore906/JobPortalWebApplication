@@ -39,7 +39,7 @@ const AllUsers = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container min-h-[95vh] max-w-7xl mt-5 ml-3 flex flex-col">
+    <div className="container min-h-[90vh] max-w-7xl mt-5 ml-3 flex flex-col">
       {errMsg ? (
         <h2 className="text-2xl font-semibold">{errMsg}</h2>
       ) : (
@@ -56,38 +56,40 @@ const AllUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.items?.map((user, index) => (
-              <tr className="border border-gray-200" key={index}>
-                <td className="py-3 px-4 flex items-center gap-2">
-                  <img
-                    src={
-                      user?.profileImagePath
-                        ? `https://localhost:7091/${user?.profileImagePath}`
-                        : assets.upload_area
-                    }
-                    alt="profile_img"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  {user?.fullName}
-                </td>
-                <td className="py-2 px-4">{user?.email}</td>
-                <td className="py-2 px-4 max-sm:hidden">{user?.location}</td>
-                <td className="py-2 px-4 max-sm:hidden">
-                  {user?.mobileNumber}
-                </td>
-                <td className="py-2 px-4">
-                  {user?.fullName !== "Admin" && (
-                    <button
-                      className="bg-red-600 px-4 py-1 text-white rounded"
-                      onClick={() => deleteUser(user?.id)}
-                      disabled={user?.fullName === "Admin"}
-                    >
-                      delete
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {data?.items?.map(
+              (user, index) =>
+                user?.fullName !== "Admin" && (
+                  <tr className="border border-gray-200" key={index}>
+                    <td className="py-3 px-4 flex items-center gap-2">
+                      <img
+                        src={
+                          user?.profileImagePath
+                            ? `https://localhost:7091/${user?.profileImagePath}`
+                            : assets.upload_area
+                        }
+                        alt="profile_img"
+                        className="w-8 h-8 rounded-full"
+                      />
+                      {user?.fullName}
+                    </td>
+                    <td className="py-2 px-4">{user?.email}</td>
+                    <td className="py-2 px-4 max-sm:hidden">
+                      {user?.location}
+                    </td>
+                    <td className="py-2 px-4 max-sm:hidden">
+                      {user?.mobileNumber}
+                    </td>
+                    <td className="py-2 px-4">
+                      <button
+                        className="bg-red-600 px-4 py-1 text-white rounded"
+                        onClick={() => deleteUser(user?.id)}
+                      >
+                        delete
+                      </button>
+                    </td>
+                  </tr>
+                )
+            )}
           </tbody>
         </table>
       )}

@@ -14,7 +14,7 @@ const JobCard = ({ job }) => {
               : assets.company_icon
           }
           alt="company_logo"
-          className="h-8 rounded-full border-1 border-gray-300"
+          className="w-8 h-8 rounded-full border-1 border-gray-300"
         />
         <span>{job?.company?.companyName}</span>
       </div>

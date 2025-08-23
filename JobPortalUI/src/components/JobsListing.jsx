@@ -6,13 +6,12 @@ import {
   JobLevel,
 } from "../assets/assets";
 import JobCard from "./JobCard";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Loading from "./Loading";
 import { useJobSearchQuery } from "../features/api/userApi";
 import { setSearchQueryAndJobLocation } from "../features/slice/jobSearchSlice";
 import Pagination from "./Pagination";
-//import { toast } from "react-toastify";
 
 const JobsListing = () => {
   const { searchQuery, jobLocation } = useSelector((state) => state.jobSearch);

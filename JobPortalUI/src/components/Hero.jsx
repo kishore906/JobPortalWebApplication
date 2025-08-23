@@ -64,7 +64,7 @@ const Hero = () => {
       {/* Companies div */}
       <div className="border border-gray-300 shadow-md mx-2 mt-5 p-6 rounded-md flex">
         <div className="flex justify-center gap-10 flex-wrap lg:gap-16">
-          <p className="font-medium">Trusted by</p>
+          <p className="font-medium">Search Job In</p>
           <img
             src={assets.microsoft_logo}
             className="h-6"

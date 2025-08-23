@@ -44,7 +44,7 @@ const AllJobs = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container p-4 min-h-[95vh] flex flex-col">
+    <div className="container p-4 min-h-[90vh] flex flex-col">
       <div className="flex gap-4">
         <button
           className={`w-28 py-2 mt-4 border-1 rounded-full ${

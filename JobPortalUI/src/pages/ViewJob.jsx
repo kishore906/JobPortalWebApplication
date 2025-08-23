@@ -197,7 +197,7 @@ const ViewJob = ({ setShowUserLogin, setShowRecruiterLogin }) => {
 
             {/* right section (more jobs) */}
             {/* <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">
-              <h2>More jobs from {job?.company?.companyName}</h2>
+              <h2>Related jobs</h2>
               {jobsData
                 .filter(
                   (eachjob) =>
